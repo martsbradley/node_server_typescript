@@ -9,6 +9,15 @@ module.exports = {
     // must be an absolute path (use the Node.js path module)
     filename: "bundle.js"
   },
+  module: {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: ['eslint-loader']
+      }]
+  },
   target: 'node',
   externals: [nodeExternals()]
 }
+

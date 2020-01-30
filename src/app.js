@@ -1,66 +1,67 @@
-const express = require('express')
-//const bodyParser = require('body-parser');
+const express = require('express');
 
-const app = express()
-const port = 3000
-
+const app = express();
+const port = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-app.get('/', (req, res) => res.send('Hello World!'))
+app.get('/', (req, res) => res.send('Hello World!'));
 
 
 const messages = [];
-let idCount = 0
+let idCount = 0;
 
 
-app.get('/users', (req, res) => {
-  return res.send('GET HTTP method on user resource');
-});
+app.get('/users', (req, res) => res.send('GET HTTP method on user resource'));
 
-app.post('/users', (req, res) => {
-  return res.send('POST HTTP method on user resource');
-});
+app.post('/users', (req, res) => res.send('POST HTTP method on user resource'));
 
-app.put('/users', (req, res) => {
-  return res.send('PUT HTTP method on user resource');
-});
+app.put('/users', (req, res) => res.send('PUT HTTP method on user resource'));
 
-app.delete('/users', (req, res) => {
-  return res.send('DELETE HTTP method on user resource');
-});
+app.delete('/users', (req, res) => res.send('DELETE HTTP method on user resource'));
 
 
+const es6Arrow = (arg) => {
+  const log = `logging ${arg}`;
+  console.log(log);
+};
 
 app.post('/messages', (req, res) => {
-    const id = idCount++;
-    const data = req.body
-    console.log(`Post message ${data} `);
-    console.log(data);
+  idCount += 1;
+  const data = req.body;
+  console.log(data);
+  console.log(Object.keys(data));
 
-    const message = {
-        id,
-        text: data
-    };
-    messages[id] = message;
-    return res.send(message);
+  const message = {
+    id: idCount,
+    text: data.text,
+  };
+
+  console.log('Post message');
+  console.log(message);
+  console.log('^^^^ ^^^^');
+
+  messages[idCount] = message;
+  return res.send(message);
 });
 
 app.get('/messages/:id', (req, res) => {
-    var id = parseInt(req.params.id);
-    console.log(`Get HTTP method on user/${id} resource`);
+  const id = parseInt(req.params.id, 10);
+  console.log(`Get HTTP method on messages/${id} resource`);
 
-    const item = messages.filter(val => val.id === id);
+  const item = messages.filter((val) => val.id === id);
+  es6Arrow('Marty');
 
-    console.log("*******");
-    console.log(item);
+  console.log('*******');
+  console.log(item);
 
-    if (item && item.length === 1)
-      return res.send(item[0]);
-    else
-      return res.send("Not found");
+  if (item && item.length === 1) {
+    return res.send(item[0]);
+  }
+
+  return res.send('Not found');
 });
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));
