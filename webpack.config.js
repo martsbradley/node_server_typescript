@@ -1,8 +1,11 @@
 const path = require('path');
 var nodeExternals = require('webpack-node-externals');
 
+ //   ,
+ // libraryTarget: 'commonjs2'
+
 module.exports = {
-  entry: "./src/app",
+  entry: "./src/app.ts",
   output: {
     path: path.resolve(__dirname, "dist"), // string
     // the target directory for all output files
@@ -12,7 +15,13 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(ts)$/,
+        exclude: /node_modules/,
+        use: ['ts-loader']
+      },
+
+      {
+        test: /\.(ts)$/,
         exclude: /node_modules/,
         use: ['eslint-loader']
       }]

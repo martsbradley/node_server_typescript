@@ -1,4 +1,4 @@
-const express = require('express');
+import  express from 'express';
 
 const app = express();
 const port = 3000;
@@ -9,8 +9,9 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => res.send('Hello World!'));
 
+type data= { text: string; id: number};
 
-const messages = [];
+const messages: data[] = [];
 let idCount = 0;
 
 
@@ -23,9 +24,10 @@ app.put('/users', (req, res) => res.send('PUT HTTP method on user resource'));
 app.delete('/users', (req, res) => res.send('DELETE HTTP method on user resource'));
 
 
-const es6Arrow = (arg) => {
+const es6Arrow = (arg: string): string => {
   const log = `logging ${arg}`;
   console.log(log);
+  return "";
 };
 
 app.post('/messages', (req, res) => {
