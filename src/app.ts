@@ -1,4 +1,5 @@
 import  express from 'express';
+import db from './databaseInterface';
 
 const app = express();
 const port = 3000;
@@ -48,6 +49,7 @@ app.post('/messages', (req, res) => {
   messages[idCount] = message;
   return res.send(message);
 });
+db();
 
 app.get('/messages/:id', (req, res) => {
   const id = parseInt(req.params.id, 10);

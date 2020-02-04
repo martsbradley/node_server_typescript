@@ -18,15 +18,19 @@ module.exports = {
         test: /\.(ts)$/,
         exclude: /node_modules/,
         use: ['ts-loader']
-      },
-
-      {
-        test: /\.(ts)$/,
-        exclude: /node_modules/,
-        use: ['eslint-loader']
-      }]
+      }
+   //   ,
+   // {
+   //   test: /\.(ts)$/,
+   //   exclude: /node_modules/,
+   //   use: ['eslint-loader']
+   // }
+    ]
   },
   target: 'node',
-  externals: [nodeExternals()]
+  externals: [nodeExternals()],
+  resolve: {
+    extensions: ['.ts', '.js']
+  }
 }
 
