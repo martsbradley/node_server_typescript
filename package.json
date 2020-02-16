@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack --mode development && node dist/bundle.js"
+    "prestart": "webpack --mode development",
+    "start": "node dist/bundle.js"
   },
   "keywords": [],
   "author": "",
