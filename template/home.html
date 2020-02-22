@@ -1,0 +1,32 @@
+<html>
+    <body>
+        <h1>Template Home and {{ firstName }} </h1>
+
+
+        <ul>
+        {% for item in mynames %}
+          <li>{{ item}}</li>
+        {% endfor %}
+        </ul>
+
+
+
+        <br/>
+        <h2>Users</h2>
+
+        <table>
+        {% for user in users %}
+        <tr>
+            <td><a href='/user/edit/{{ user.id}}'>{{user.id}}</a></td>
+            <td>{{ user.forename}}</td>
+            <td>{{ user.surname}}</td>
+            <td>{{ user.dob }}</td>
+            <td>{{ user.sex }}</td>
+        </tr>
+        {% endfor %}
+        </table>
+
+    </body>
+
+
+</html>
