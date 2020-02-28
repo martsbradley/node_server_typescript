@@ -1,7 +1,6 @@
 //const { Pool } = require('pg')
 //import Pool from 'pg';
 import { Pool } from 'pg';
-import { Response } from "express";
 import User from './user';
 
 
@@ -40,23 +39,41 @@ export const queryUser = async (id: number): Promise<User> => {
 
     let user: User = null;
 
-    try {
-        const dbresult = await pool.query('SELECT * from patient where id = $1', [id]);
+    const dbresult = await pool.query('SELECT * from patient where id = $1', [id]);
 
-        if (dbresult.rows.length === 1) {
-            const row = dbresult.rows[0];
+    if (dbresult.rows.length === 1) {
+        const row = dbresult.rows[0];
 
-            user = new User(row.id,
-                            row.forename,
-                            row.surname,
-                            row.sex,
-                            row.dateofbirth);
-            console.log("Found user " + user);
-        }
+        user = new User(row.id,
+                        row.forename,
+                        row.surname,
+                        row.sex,
+                        row.dateofbirth);
+        console.log("Found user " + user);
     }
-    catch (error) {
-        console.log("issue..." + error);
+    return user;
+}
+export const queryUserThrow = async (id: number): Promise<User> => {
+
+    console.log(`Query User ${id}`);
+
+    let user: User = null;
+
+    const dbresult = await pool.query('SELECT * from patient where id = $1', [id]);
+
+    if (dbresult.rows.length !== 1) {
+        console.log(`${id} was not found, throwing an error`);
+      throw new Error('Not found') // Express will catch this on its own.
     }
+    const row = dbresult.rows[0];
+
+    user = new User(row.id,
+                    row.forename,
+                    row.surname,
+                    row.sex,
+                    row.dateofbirth);
+    console.log("Found user " + user);
+    
     return user;
 }
 

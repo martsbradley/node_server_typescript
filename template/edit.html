@@ -2,10 +2,14 @@
     <body>
         <h1>Edit User</h1>
 
+        
         <form method="post" action="/user/save">
             <br/>name <input type="text" name="forename" value="{{ forename }}"></input>
+            <span>{{ errors.forename }}</span>
             <br/>surname <input type="text" name="surname" value="{{ surname }}"></input>
+            <span>{{ errors.surname }}</span>
             <br/>sex <input type="text" name="sex" value="{{ sex }}"></input>
+            <span>{{ errors.sex }}</span>
 
             <br/>
 
@@ -14,6 +18,4 @@
         </form>
 
     </body>
-
-
 </html>
