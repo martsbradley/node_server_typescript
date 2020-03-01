@@ -1,6 +1,5 @@
 import express from 'express';
 import { query, saveName, queryUser, queryUserThrow } from './databaseInterface';
-//import validate from 'express-validation';
 import nunjucks from 'nunjucks';
 import Joi from 'joi';
 import { checkSchema, validationResult } from 'express-validator';
@@ -63,9 +62,16 @@ export const userSchema = {
 };
 
 
-function errorMapper(keys: string[], errorList: any[]) {
+interface MyType {
+    [x: string]: string;
+}
 
-    const result: {[x: string]: string} = {};
+// This maps from the express-validator results into
+// something that is easier the nunjucks template to consume 
+function errorMapper(keys: string[], 
+                     errorList: {param: string; msg: string}[]): MyType 
+{
+    const result: MyType = {};
 
     errorList.map(e => {
         if (keys.indexOf(e.param) != -1) {
@@ -97,7 +103,15 @@ app.post('/user/save', checkSchema(userSchema),
     const data = req.body;
     console.log('Need to save' + data)
 
-    await saveName(data);
+    try {
+        await saveName(data);
+    } catch (err) {
+        console.log("Yes hit error " + err);
+
+        const user = req.body;
+        user.errors = {'general': '' + err};
+        return res.render('edit.html', user);
+    }
 
     return res.redirect('/user/list');
 });

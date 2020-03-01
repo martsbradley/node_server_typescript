@@ -20,16 +20,11 @@ export const saveName = async (data: User): Promise<boolean> => {
 
     let result = false;
 
-    try {
-        console.log(`Should update to ${data.forename} ${data.surname}`);
-        await pool.query('update patient set forename = $1, surname = $2 WHERE id = $3',
-            [data.forename, data.surname, data.id]);
-        result = true;
-    }
-    catch (error) {
-        console.log("Went wrong ");
-        console.log(error);
-    }
+    console.log(`Should update to ${data.forename} ${data.surname}`);
+    await pool.query('update patient set forename = $1, surname = $2 WHERE id = $3',
+        [data.forename, data.surname, data.id]);
+
+    result = true;
     return result;
 }
 

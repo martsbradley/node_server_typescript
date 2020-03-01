@@ -2,6 +2,7 @@
     <body>
         <h1>Edit User</h1>
 
+        <span>{{ errors.general }}</span>
         
         <form method="post" action="/user/save">
             <br/>name <input type="text" name="forename" value="{{ forename }}"></input>
