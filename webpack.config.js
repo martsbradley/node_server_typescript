@@ -1,8 +1,7 @@
+const webpack = require('webpack');
 const path = require('path');
 var nodeExternals = require('webpack-node-externals');
 
- //   ,
- // libraryTarget: 'commonjs2'
 
 module.exports = {
   entry: "./src/app.ts",
@@ -30,6 +29,8 @@ module.exports = {
   externals: [nodeExternals()],
   resolve: {
     extensions: ['.ts', '.js']
-  }
+  },
+//plugins: [
+//   new webpack.HotModuleReplacementPlugin()
+//],
 }
-

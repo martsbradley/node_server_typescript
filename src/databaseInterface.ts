@@ -1,101 +1,130 @@
-//const { Pool } = require('pg')
-//import Pool from 'pg';
 import { Pool } from 'pg';
 import User from './user';
 
+export default class Database {
 
-console.log("Create Database Connection");
+  pool: Pool;
 
-const pool = new Pool({
-  user: 'pguser',
-  host: 'localhost',
-  database: 'pgdatabase',
-  password: 'pguser1',
-  port: 5432,
-})
+  constructor() {
+    console.log(`Connecting to Database ... ${process.env["PG_DATABASE"]}`);
+    this.pool = new Pool({
+        user:     process.env["PG_USER"],
+        password: process.env["PG_PASSWORD"],
+        database: process.env["PG_DATABASE"],
+        host:     process.env["PG_SERVER"],
+        port: 5432,
+      });
+
+  }
 
 
-export const saveName = async (data: User): Promise<boolean> => {
-    console.log("saveName");
+
+
+  async savePatient(data: User): Promise<boolean>  {
+    console.log("savePatient");
 
     let result = false;
 
     console.log(`Should update to ${data.forename} ${data.surname}`);
-    await pool.query('update patient set forename = $1, surname = $2 WHERE id = $3',
-        [data.forename, data.surname, data.id]);
+
+    console.log(data);
+
+    try {
+        await this.pool.query('update patient set ' +
+                          'forename = $1,' +
+                          'surname  = $2,' +
+                          'sex      = $3 ' +
+                          'WHERE id = $4',
+            [data.forename, data.surname, data.sex, data.id]);
+    }catch (err) {
+
+        console.log("Save failed " + err);
+
+
+        throw {"general": "Database Error, unable to Save User"};
+    }
 
     result = true;
     return result;
 }
 
-export const queryUser = async (id: number): Promise<User> => {
+async queryUser (id: number): Promise<User> {
 
     console.log(`Query User ${id}`);
 
-    let user: User = null;
+    const queryStr= 'select p.id as pID, m.id as mID, * '   +
+                    'from patient p '                       +
+                    'left outer join prescription pre '     +
+                    'on p.id = pre.patient_id '             +
+                    'left outer join medicine m '           +
+                    'on pre.medicine_id = m.id '            +
+                    'where p.id = $1';
 
-    const dbresult = await pool.query('SELECT * from patient where id = $1', [id]);
+    const dbresult = await this.pool.query(queryStr, [id]);
 
-    if (dbresult.rows.length === 1) {
-        const row = dbresult.rows[0];
-
-        user = new User(row.id,
-                        row.forename,
-                        row.surname,
-                        row.sex,
-                        row.dateofbirth);
-        console.log("Found user " + user);
-    }
-    return user;
-}
-export const queryUserThrow = async (id: number): Promise<User> => {
-
-    console.log(`Query User ${id}`);
+    console.log("Running query");
 
     let user: User = null;
 
-    const dbresult = await pool.query('SELECT * from patient where id = $1', [id]);
+    if (dbresult.rows.length > 0) {
+      let firstRow = true;
 
-    if (dbresult.rows.length !== 1) {
-        console.log(`${id} was not found, throwing an error`);
-      throw new Error('Not found') // Express will catch this on its own.
-    }
-    const row = dbresult.rows[0];
-
-    user = new User(row.id,
-                    row.forename,
-                    row.surname,
-                    row.sex,
-                    row.dateofbirth);
-    console.log("Found user " + user);
-    
-    return user;
-}
-
-
-export const query = async (): Promise<User[]> => {
-  console.log("Query All Users");
-  const users: User[] = [];
-
-  try {
-    const dbresult = await pool.query('SELECT * from patient order by id');
-
-    for (const i in dbresult.rows) {
+      for (const i in dbresult.rows) {
         const row = dbresult.rows[i];
-        const user = new User(row.id,
-                              row.forename,
-                              row.surname,
-                              row.sex,
-                              row.dateofbirth);
-      users.push(user);
+        console.log(row);
+
+        if (firstRow) {
+          console.log(`Using ${row.pid} as the id`);
+          user = new User(row.pid,
+                          row.forename,
+                          row.surname,
+                          row.sex,
+                          row.dateofbirth);
+          firstRow = false;
+        }
+
+        if (row.medicine_id !== null) {
+          const prescription ={medicineId: row.medicine_id,
+                                startDate: row.start_date,
+                                endDate:   row.end_date,
+                                amount:    row.amount ,
+                                name:      row.name};
+
+          user.addPrescription(prescription);
+        }
+      }
+
+      console.log("Found user " + user);
     }
-  }
-  catch (error) {
-      console.log("issue..." + error);
-  }
-  return users;
+    return user;
 }
 
-export function closeDatabase(): void {
-  pool.end()
+  async queryAllPatients(): Promise<User[]> {
+    const users: User[] = [];
+
+    try {
+      const dbresult = await this.pool.query('SELECT * from patient order by id');
+
+      for (const i in dbresult.rows) {
+          const row = dbresult.rows[i];
+          const user = new User(row.id,
+                                row.forename,
+                                row.surname,
+                                row.sex,
+                                row.dateofbirth);
+        users.push(user);
+      }
+    }
+    catch (error) {
+        console.log(error);
+        throw {"general": "Database Error, unable to Query User"};
+    }
+    return users;
+  }
+
+  closeDatabase(): void{ 
+      console.log("closing pool")
+      this.pool.end()
+      console.log("closed pool")
+  }
 }

@@ -1,22 +1,52 @@
-<html>
-    <body>
-        <h1>Edit User</h1>
+{% extends "bootstraped.html" %}
 
-        <span>{{ errors.general }}</span>
-        
-        <form method="post" action="/user/save">
-            <br/>name <input type="text" name="forename" value="{{ forename }}"></input>
-            <span>{{ errors.forename }}</span>
-            <br/>surname <input type="text" name="surname" value="{{ surname }}"></input>
-            <span>{{ errors.surname }}</span>
-            <br/>sex <input type="text" name="sex" value="{{ sex }}"></input>
-            <span>{{ errors.sex }}</span>
+{% block TitleBlock %}
+This the edit page
+{% endblock %}
 
-            <br/>
 
-            <input type="hidden" name="id" value="{{ id }}"></input>
-            <input type="submit"name="Submit"></input>
-        </form>
+{% block MainBlock %}
+<h1>Edit User</h1>
 
-    </body>
-</html>
+<span>{{ errors.general }}</span>
+
+<form method="post" action="/user/save">
+    <div className="col-md-6 form-line">
+        <div className="form-group">
+            <label htmlFor="forename">Forename</label>
+            <input type="text" class="form-control" name="forename" value="{{ user.forename}}" />
+            <span class="errors">{{errors.forename}}</span>
+        </div>
+    </div>
+    <div className="col-md-6 form-line">
+        <div className="form-group">
+            <label htmlFor="forename">Surname</label>
+            <input type="text" class="form-control" name="surname" value="{{ user.surname}}" />
+            <span class="errors">{{errors.surname}}</span>
+        </div>
+    </div>
+    <div className="col-md-6 form-line">
+        <div className="form-group">
+            <label htmlFor="forename">Sex</label>
+            <input type="text" class="form-control" name="sex" value="{{ user.sex}}" />
+            <span class="errors">{{errors.sex}}</span>
+        </div>
+    </div>
+
+    <h2>Show Prescriptions</h2>
+    <table class="table table-bordered">
+    {% for p in user.prescriptions %}
+    <tr>
+        <td class="d-none d-sm-table-cell"><a href='/user/edit?id='>{{p.medicineId}}</a></td>
+        <td>{{ p.startDate}}</td>
+        <td class="d-none d-sm-table-cell">{{ p.amount }}</td>
+        <td class="d-none d-sm-table-cell">{{ p.name }}</td>
+    </tr>
+    {% endfor %}
+    </table>
+
+    <input type="hidden" name="id" value="{{ user.id }}"></input>
+    <input type="button" name="Cancel" value="Cancel"   onclick="window.history.back();" input>
+    <input type="submit" name="Submit" value="Save"></input>
+</form>
+{% endblock %}
