@@ -1,5 +1,5 @@
 import express = require('express');
-import Database  from './databaseInterface';
+import Database  from './database';
 import { checkSchema } from 'express-validator';
 import Routes from './routes';
 

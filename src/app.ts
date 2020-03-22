@@ -1,6 +1,6 @@
 import Server from './server';
 import nunjucks from 'nunjucks';
-import Database  from './databaseInterface'; 
+import Database  from './database'; 
 
 const db: Database = new Database();
 const server = new Server(db);

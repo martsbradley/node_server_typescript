@@ -1,4 +1,4 @@
-import Database  from './databaseInterface';
+import Database  from './database';
 import { Pool } from 'pg';
 import User from './user';
 

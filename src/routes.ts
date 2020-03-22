@@ -1,5 +1,5 @@
 import express from 'express';
-import Database  from './databaseInterface';
+import Database  from './database';
 //import { Location,checkSchema, validationResult } from 'express-validator';
 
 import {checkValidationResults} from './validation';

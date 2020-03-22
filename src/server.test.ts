@@ -1,6 +1,6 @@
 import Server  from './server';
 import request  from 'supertest';
-import Database  from './databaseInterface'; 
+import Database  from './database'; 
 import nunjucks from 'nunjucks';
 
 describe('Server',  function() {

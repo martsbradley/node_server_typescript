@@ -2,7 +2,7 @@ var MockExpressRequest = require('mock-express-request');
 var MockExpressResponse = require('mock-express-response');
 import Routes from './routes';
 import User from './user';
-import Database from './databaseInterface';
+import Database from './database';
 
 
 var data ={id:1,
@@ -13,7 +13,7 @@ var data ={id:1,
 
 const mockQueryAllPatients =  jest.fn(() => { return {rows:[data]}});
 
-jest.mock('./databaseInterface', () => {
+jest.mock('./database', () => {
   return jest.fn().mockImplementation(() => {
     return {queryAllPatients: mockQueryAllPatients}
   });
