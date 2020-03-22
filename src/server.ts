@@ -48,7 +48,6 @@ export default class Server {
         this.routes.editHandler(req, res);
     }
     listHandler(req: express.Request, res: express.Response){
-        console.log("listHandler");
         this.routes.listHandler(req, res);
     }
 }

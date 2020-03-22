@@ -28,13 +28,16 @@ describe("Routes", () => {
     const response = new MockExpressResponse({
 
       render: function(viewname: any, responseData: any) {
-        console.log(responseData);
         const user: User = responseData.users.rows[0];
-        console.log(user);
+        console.log(`Loaded ${user.forename} ${user.surname}`);
       }
     });
 
     await routes.listHandler(request, response);
     done();
   });
+
+  it('Display Environment', () => {
+    console.log(`Logging in as ${process.env.PG_USER} into database ${process.env.PG_DATABASE}`);
+  })
 });

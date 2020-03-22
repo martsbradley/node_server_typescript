@@ -26,8 +26,6 @@ describe('API Tests',  function() {
             .expect('Content-Type', 'text/html; charset=utf-8')
             .expect(200)
             .end(function(err, res) {
-                console.log("Here done yea");
-                console.log(res);
                 done();
             });
     });

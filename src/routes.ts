@@ -68,7 +68,6 @@ export default class Routes {
             'users': users,
             'lastName': 'Bradley',
         };
-        console.log("here2");
 
         return res.render('home.html', data);
     }
