@@ -3,7 +3,7 @@ import Database  from './databaseInterface';
 import { checkSchema } from 'express-validator';
 import Routes from './routes';
 
-import { idParamSchema, userSchema} from './validation';
+import { idParamSchema, NewUserSchema, UserSchema} from './validation';
 
 
 export default class Server {
@@ -23,7 +23,7 @@ export default class Server {
         this.routes = new Routes(this.db);
 
         this.express.post('/user/save', 
-                         checkSchema(userSchema), 
+                         checkSchema(UserSchema), 
                          this.saveHandler.bind(this));
 
         this.express.get('/user/edit', 

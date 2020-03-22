@@ -3,7 +3,7 @@ import request  from 'supertest';
 import Database  from './databaseInterface'; 
 import nunjucks from 'nunjucks';
 
-describe('API Tests',  function() {
+describe('Server',  function() {
     let  db: Database;
     let  server: Server = null;
     beforeAll(() => {
@@ -20,7 +20,7 @@ describe('API Tests',  function() {
         db.closeDatabase();
     });
 
-    it('test2', function(done) {
+    it('get', function(done) {
         request(server.express)
             .get('/user/list')
             .expect('Content-Type', 'text/html; charset=utf-8')
@@ -28,5 +28,22 @@ describe('API Tests',  function() {
             .end(function(err, res) {
                 done();
             });
+    });
+    it('post', function(done) {
+        request(server.express)
+            .post('/user/save')
+            .send({id: 22,
+                   forename: 'JoshMatz', 
+                   surname: 'JoshMatz',
+                   sex: 'Male'})
+            .expect('Content-Type', 'text/html; charset=utf-8')
+            .expect(200)
+            .end(function(err, res) {
+                console.log(res);
+                //expect(res.text).to.equal('{ "id": 500 }');
+                done();
+            });
+
+            //Database Error, unable to Save User
     });
 });

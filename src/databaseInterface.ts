@@ -25,17 +25,23 @@ export default class Database {
 
     let result = false;
 
-    console.log(`Should update to ${data.forename} ${data.surname}`);
+    console.log(`Should update primarykey ${data.id} to ${data.forename} ${data.surname}`);
 
     console.log(data);
 
     try {
-        await this.pool.query('update patient set ' +
+        const res = await this.pool.query('update patient set ' +
                           'forename = $1,' +
                           'surname  = $2,' +
                           'sex      = $3 ' +
                           'WHERE id = $4',
             [data.forename, data.surname, data.sex, data.id]);
+
+        console.log(`savePatient query updated ${res.rowCount} row(s)`);
+
+        if (res.rowCount == 0) {
+          throw {"general": "Database Error, unable to Save User"};
+        }
     }catch (err) {
 
         console.log("Save failed " + err);

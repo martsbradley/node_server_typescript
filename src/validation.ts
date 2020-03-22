@@ -25,48 +25,62 @@ function errorMapper(keys: string[],
 }
 
 //const body: Location= 'body';
+
 const nameCharacters = "'.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ";
 
-export const idParamSchema =  {
-    id: {
-        in: 'query' as Location,
-        isInt: {
-            options:{ min: 1, max: 30},
-            errorMessage: 'Id out of range'
-        }
-    }
-};
 
-export const userSchema = {
-    'forename': {
+function nameValid(part: string, minLen: number, maxLen: number) {
+    return {
         in: 'body' as Location,
         isAlpha: { 
             errorMessage: 'Not alphabetic',
         },
         isLength: {
-            errorMessage: 'forename should be at least 7 chars long',
-            options: { min: 3 }
+            errorMessage: `${part}should be at least 7 chars long`,
+            options: { min: minLen,
+                       max: maxLen }
         },
         trim: {
           options: " "
         }
-    },
-    'surname': {
-        in: 'body' as Location,
-        isLength: {
-            errorMessage: 'surname should be at least 7 chars long',
-            options: { min: 3 }
-        },
-        isWhitelisted : { options: nameCharacters,
-                          errorMessage: 'Invalid character entered' },
-        trim: {
-          options: " "
-        }
-    },
+    };
+}
+
+const validId = { 
+    isInt: {
+        options:{ min: 1, max: 30},
+        errorMessage: 'Id out of range'
+    }
+};
+
+export const idParamSchema =  {
+    id: {
+        in: 'query' as Location,
+        ...validId
+    }
+};
+
+const inBody = {
+    in: 'body' as Location
+}
+
+export const NewUserSchema = {
+
+    'forename': nameValid("forname", 3, 20),
+    'surname':  nameValid("surname", 3, 20),
     'sex': {
+        ...inBody,
         isIn: {options: [['Male', 'Female']] },
     }
 };
+
+export const UserSchema = {
+    id: {
+        ...inBody,
+        ...validId
+    },
+    ...NewUserSchema
+}
 
 export function checkValidationResults(req: express.Request): void{
     const errors = validationResult(req);
