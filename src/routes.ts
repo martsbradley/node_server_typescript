@@ -5,6 +5,7 @@ import Database  from './database';
 
 import {checkValidationResults, UserSchema} from './validation';
 import { validationResult } from 'express-validator';
+import { AssertionError } from 'assert';
 
 export default class Routes {
 
@@ -14,8 +15,12 @@ export default class Routes {
         this.db = dab;
     }
 
-    async updatePatientHandler(req: express.Request, res: express.Response, next: express.NextFunction) {
+    async updatePatientHandler(req: express.Request, 
+                               res: express.Response, 
+                               next: express.NextFunction): Promise<void> {
         const user = req.body;
+        console.log("update this ...");
+        console.log(user);
         try {
             console.log(`Referred from ${req.header('Referer')}\nNeed to update "${user.id}"`);
             checkValidationResults(req);
@@ -48,12 +53,12 @@ export default class Routes {
         return res.redirect('/users/list');
     }
 
-    async createPatientForm(req: express.Request, res: express.Response) {
-        const user = {};
+    async createPatientForm(req: express.Request, res: express.Response): Promise<void> {
+        const user: object = { dob: 'Sat Mar 01 2020 00:00:00'};
         return res.render('patient_new.html', {'user': user});
     }
 
-    async createPatientHandler(req: express.Request, res: express.Response) {
+    async createPatientHandler(req: express.Request, res: express.Response): Promise<void> {
 
         const user = req.body;
         let userId = undefined;
@@ -77,7 +82,7 @@ export default class Routes {
         return res.redirect('/users/list');
     }
 
-    async loadPatientHandler(req: express.Request, res: express.Response) {
+    async loadPatientHandler(req: express.Request, res: express.Response): Promise<void> {
 
         const errors = validationResult(req);
 
@@ -101,7 +106,7 @@ export default class Routes {
     }
 
     async listPatients(req: express.Request,
-                       res: express.Response) {
+                       res: express.Response): Promise<void> {
 
         const users = await this.db.queryAllPatients();
 

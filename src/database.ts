@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-import User from './user';
+import User, { Prescription } from './user';
 import assert  from 'assert';
 
 export default class Database {
@@ -44,14 +44,16 @@ export default class Database {
 
     let result = false;
 
-    console.log(`Should update primarykey ${user.id} to ${user.forename} ${user.surname}`);
+    console.log(`Update Patient ${user.id} to ${user.forename} ${user.surname} ${user.dob}`);
+
     try {
         const res = await this.pool.query('update patient set ' +
-                          'forename = $1,' +
-                          'surname  = $2,' +
-                          'sex      = $3 ' +
-                          'WHERE id = $4',
-            [user.forename, user.surname, user.sex, user.id]);
+                          'forename    = $1,' +
+                          'surname     = $2,' +
+                          'sex         = $3,' +
+                          'dateofbirth = $4 ' +
+                          'WHERE id = $5',
+            [user.forename, user.surname, user.sex, user.dob, user.id]);
 
         console.log(`updatePatient ${res.rowCount}`);
         if (res.rowCount == 0) {
@@ -91,25 +93,35 @@ async queryUser (id: number): Promise<User> {
 
       for (const i in dbresult.rows) {
         const row = dbresult.rows[i];
-        console.log(row);
 
         if (firstRow) {
-          console.log(`Using ${row.pid} as the id`);
+
+        //  console.log("Got date..");
+        //console.log(Object.keys(row.dateofbirth));
+        //console.log(`Date  is ${row.dateofbirth}`);
+        //console.log(`Using ${row.pid} as the id`);
+          const d = new Date(row.dateofbirth);
+        // console.log(d);
+
           user = new User(row.pid,
                           row.forename,
                           row.surname,
                           row.sex,
-                          row.dateofbirth);
+                          d);
           firstRow = false;
         }
 
         if (row.medicine_id !== null) {
-          const prescription ={medicineId: row.medicine_id,
-                                startDate: row.start_date,
-                                endDate:   row.end_date,
-                                amount:    row.amount ,
-                                name:      row.name};
-
+        //const prescription ={medicineId: row.medicine_id,
+        //                      startDate: row.start_date,
+        //                      endDate:   row.end_date,
+        //                      amount:    row.amount ,
+        //                      name:      row.name};
+          const prescription = new Prescription(row.medicine_id,
+                                                row.start_date,
+                                                row.end_date,
+                                                row.amount ,
+                                                row.name);
           user.addPrescription(prescription);
         }
       }

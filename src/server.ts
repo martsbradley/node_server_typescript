@@ -46,36 +46,36 @@ export default class Server {
         this.express.get('/users/list', 
                          this.listPatients.bind(this));
 
-        this.express.use(function (err: any, req: express.Request, res: express.Response, _nextIgnored: express.NextFunction) {
+        this.express.use(function (err: object, req: express.Request, res: express.Response, _nextIgnored: express.NextFunction) {
             console.error("Here in the handler");
             console.error(err)
             res.status(500).send('Server 500: Unexpected Error')
         });
     }
 
-    listen(port: number){
+    listen(port: number): void{
         console.log(`This ${port} opening...`)
         console.log(`By ${this.express}`)
         this.express.listen(port, () => console.log(`Example app listening on port ${port}!`));
     }
 
-    updatePatientHandler(req: express.Request, res: express.Response, next: express.NextFunction){
+    updatePatientHandler(req: express.Request, res: express.Response, next: express.NextFunction): void{
         this.routes.updatePatientHandler(req, res, next);
     }
 
-    loadPatientHandler(req: express.Request, res: express.Response){
+    loadPatientHandler(req: express.Request, res: express.Response): void{
         this.routes.loadPatientHandler(req, res);
     }
 
-    listPatients(req: express.Request, res: express.Response){
+    listPatients(req: express.Request, res: express.Response): void{
         this.routes.listPatients(req, res);
     }
 
-    createPatientHandler(req: express.Request, res: express.Response){
+    createPatientHandler(req: express.Request, res: express.Response): void{
         this.routes.createPatientHandler(req, res);
     }
 
-    createPatientForm(req: express.Request, res: express.Response){
+    createPatientForm(req: express.Request, res: express.Response): void{
         this.routes.createPatientForm(req, res);
     }
 }

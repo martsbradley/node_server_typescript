@@ -10,7 +10,7 @@ This the edit page
 
 <span>{{ errors.general }}</span>
 
-<form method="post" action="/user">
+<form method="post" action="/user/new">
     <div className="col-md-6 form-line">
         <div className="form-group">
             <label htmlFor="forename">Forename</label>
@@ -32,21 +32,15 @@ This the edit page
             <span class="errors">{{errors.sex}}</span>
         </div>
     </div>
+    <div className="col-md-6 form-line">
+        <div className="form-group">
+            <label htmlFor="dob">Dob</label>
+            <input type="date" class="form-control" name="dob" value="{{ user.dob}}" />
+            <span class="errors">{{errors.dob}}</span>
+        </div>
+    </div>
 
-    <h2>Show Prescriptions</h2>
-    <table class="table table-bordered">
-    {% for p in user.prescriptions %}
-    <tr>
-        <td class="d-none d-sm-table-cell"><a href='/user/edit?id='>{{p.medicineId}}</a></td>
-        <td>{{ p.startDate}}</td>
-        <td class="d-none d-sm-table-cell">{{ p.amount }}</td>
-        <td class="d-none d-sm-table-cell">{{ p.name }}</td>
-    </tr>
-    {% endfor %}
-    </table>
-
-    <input type="hidden" name="id" value="{{ user.id }}"></input>
     <input type="button" name="Cancel" value="Cancel"   onclick="window.history.back();" input>
-    <input type="submit" name="Submit" value="Save"></input>
+    <input type="submit" name="Submit" value="Create Patient"></input>
 </form>
 {% endblock %}

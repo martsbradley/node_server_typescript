@@ -32,13 +32,20 @@ This the edit page
             <span class="errors">{{errors.sex}}</span>
         </div>
     </div>
+    <div className="col-md-6 form-line">
+        <div className="form-group">
+            <label htmlFor="dob">Dob</label>
+            <input type="date" class="form-control" name="dob" value="{{ user.dateOfBirth}}" />
+            <span class="errors">{{errors.dob}}</span>
+        </div>
+    </div>
 
     <h2>Show Prescriptions</h2>
     <table class="table table-bordered">
     {% for p in user.prescriptions %}
     <tr>
         <td class="d-none d-sm-table-cell"><a href='/user/edit?id='>{{p.medicineId}}</a></td>
-        <td>{{ p.startDate}}</td>
+        <td>{{ p.startDateStr}}</td>
         <td class="d-none d-sm-table-cell">{{ p.amount }}</td>
         <td class="d-none d-sm-table-cell">{{ p.name }}</td>
     </tr>

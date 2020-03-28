@@ -1,11 +1,11 @@
-var MockExpressRequest = require('mock-express-request');
-var MockExpressResponse = require('mock-express-response');
+const MockExpressRequest = require('mock-express-request');
+const MockExpressResponse = require('mock-express-response');
 import Routes from './routes';
 import User from './user';
 import Database from './database';
 
 
-var queryData ={id:1,
+const queryData ={id:1,
                 forename: "Martin",
                 surname: "Bradley",
                 sex: "Male",
@@ -37,7 +37,7 @@ describe("Routes", () => {
     const request = new MockExpressRequest();
     const response = new MockExpressResponse({
 
-    render: function(viewname: any, responseData: any) {
+    render: function(viewname: any, responseData: any): void {
         const user: User = responseData.users.rows[0];
         console.log(`Loaded ${user.forename} ${user.surname}`);
       }
@@ -86,7 +86,7 @@ describe("Routes", () => {
           expect(viewname).toEqual('/users/list');
     };
 
-    request.header = () => {return 'martyok';};
+    //request.header = () => {return 'martyok';};
     request.body   = {id : 24,
                       forename : 'xxxx'};
 

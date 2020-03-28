@@ -29,7 +29,7 @@ function errorMapper(keys: string[],
 const nameCharacters = "'.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ";
 
 
-function nameValid(part: string, minLen: number, maxLen: number) {
+function nameValid(part: string, minLen: number, maxLen: number): object {
     return {
         in: 'body' as Location,
         isAlpha: { 
