@@ -96,12 +96,7 @@ async queryUser (id: number): Promise<User> {
 
         if (firstRow) {
 
-        //  console.log("Got date..");
-        //console.log(Object.keys(row.dateofbirth));
-        //console.log(`Date  is ${row.dateofbirth}`);
-        //console.log(`Using ${row.pid} as the id`);
           const d = new Date(row.dateofbirth);
-        // console.log(d);
 
           user = new User(row.pid,
                           row.forename,

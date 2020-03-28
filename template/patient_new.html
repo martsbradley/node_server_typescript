@@ -27,8 +27,10 @@ This the edit page
     </div>
     <div className="col-md-6 form-line">
         <div className="form-group">
-            <label htmlFor="forename">Sex</label>
-            <input type="text" class="form-control" name="sex" value="{{ user.sex}}" />
+            <label htmlFor="sex">Sex</label>
+
+            {% include "include/sex_radio_button.html" %}
+
             <span class="errors">{{errors.sex}}</span>
         </div>
     </div>
