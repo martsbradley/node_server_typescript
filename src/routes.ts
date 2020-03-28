@@ -1,8 +1,9 @@
 import express from 'express';
 import Database  from './database';
 //import { Location,checkSchema, validationResult } from 'express-validator';
+//import { Location,checkSchema, validationResult } from 'express-validator';
 
-import {checkValidationResults} from './validation';
+import {checkValidationResults, UserSchema} from './validation';
 import { validationResult } from 'express-validator';
 
 export default class Routes {
@@ -45,6 +46,11 @@ export default class Routes {
 
         console.log("Calling redirect");
         return res.redirect('/users/list');
+    }
+
+    async createPatientForm(req: express.Request, res: express.Response) {
+        const user = {};
+        return res.render('patient_new.html', {'user': user});
     }
 
     async createPatientHandler(req: express.Request, res: express.Response) {

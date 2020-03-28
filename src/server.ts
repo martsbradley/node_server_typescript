@@ -6,6 +6,7 @@ import Routes from './routes';
 import { idParamSchema, NewUserSchema, UserSchema} from './validation';
 
 
+
 export default class Server {
 
     db: Database;
@@ -20,11 +21,12 @@ export default class Server {
         this.express.use(express.urlencoded({ extended: true }));
         this.express.use(express.static('public'))
 
-
-
-
         this.routes = new Routes(this.db);
 
+        // Endpoint for new user form
+        this.express.get('/user/new', 
+                         checkSchema(NewUserSchema), 
+                         this.createPatientForm.bind(this));
 
         // Endpoint for creating new users.
         this.express.post('/user/new', 
@@ -44,7 +46,7 @@ export default class Server {
         this.express.get('/users/list', 
                          this.listPatients.bind(this));
 
-        this.express.use(function (err: any, req: express.Request, res: express.Response, next: express.NextFunction) {
+        this.express.use(function (err: any, req: express.Request, res: express.Response, _nextIgnored: express.NextFunction) {
             console.error("Here in the handler");
             console.error(err)
             res.status(500).send('Server 500: Unexpected Error')
@@ -71,5 +73,9 @@ export default class Server {
 
     createPatientHandler(req: express.Request, res: express.Response){
         this.routes.createPatientHandler(req, res);
+    }
+
+    createPatientForm(req: express.Request, res: express.Response){
+        this.routes.createPatientForm(req, res);
     }
 }

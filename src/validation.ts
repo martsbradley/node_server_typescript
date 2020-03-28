@@ -33,10 +33,10 @@ function nameValid(part: string, minLen: number, maxLen: number) {
     return {
         in: 'body' as Location,
         isAlpha: { 
-            errorMessage: 'Not alphabetic',
+            errorMessage: 'Please enter alphabetic names',
         },
         isLength: {
-            errorMessage: `${part}should be at least 7 chars long`,
+            errorMessage: `Please enter between ${minLen} and ${maxLen} characters`,
             options: { min: minLen,
                        max: maxLen }
         },
@@ -66,8 +66,8 @@ const inBody = {
 
 export const NewUserSchema = {
 
-    'forename': nameValid("forname", 3, 20),
-    'surname':  nameValid("surname", 3, 20),
+    'forename': nameValid("forname", 1, 20),
+    'surname':  nameValid("surname", 1, 50),
     'sex': {
         ...inBody,
         isIn: {options: [['Male', 'Female']] },
