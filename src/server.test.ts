@@ -20,30 +20,48 @@ describe('Server',  function() {
         db.closeDatabase();
     });
 
-    it('get', function(done) {
+    it('List Patients', function(done) {
         request(server.express)
-            .get('/user/list')
+            .get('/users/list')
             .expect('Content-Type', 'text/html; charset=utf-8')
             .expect(200)
             .end(function(err, res) {
                 done();
             });
     });
-    it('post', function(done) {
+
+    it('Negative Post /user/ modify an unknown', function(done) {
+        const unknownId: number = undefined;
         request(server.express)
-            .post('/user/save')
-            .send({id: 22,
-                   forename: 'JoshMatz', 
-                   surname: 'JoshMatz',
+            .post('/user/')
+            .send({id: unknownId,
+                   forename: 'Some', 
+                   surname: 'Buddy',
                    sex: 'Male'})
-            .expect('Content-Type', 'text/html; charset=utf-8')
-            .expect(200)
             .end(function(err, res) {
-                console.log(res);
-                //expect(res.text).to.equal('{ "id": 500 }');
+                expect(res.status).toEqual(500);
+                expect(res.text).toContain('Unexpected Error');
+                expect(res.header['content-type']).toEqual("text/html; charset=utf-8");
                 done();
             });
+    });
 
-            //Database Error, unable to Save User
+    it('Positive Post /user/new', function(done) {
+        const unknownId: number = undefined;
+        request(server.express)
+            .post('/user/new')
+            .send({id: unknownId,
+                   forename: 'Some', 
+                   surname: 'Buddy',
+                   sex: 'Male',
+                   dob: 'Sat Jan 01 2011 00:00:00'})
+            .end(function(err, res) {
+                console.log("ok checking now");
+                console.log(res.text);
+                expect(res.text).toContain('Found. Redirecting to /users/list');
+                expect(res.status).toEqual(302);
+                expect(res.header['content-type']).toEqual("text/plain; charset=utf-8");
+                done();
+            });
     });
 });

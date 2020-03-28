@@ -86,7 +86,7 @@ export function checkValidationResults(req: express.Request): void{
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
-        console.log("Hi here found some issues.")
+        console.log("Validation issues!!!");
 
         console.log(errors);
 
@@ -94,6 +94,7 @@ export function checkValidationResults(req: express.Request): void{
 
         const userErrors = errorMapper(keys, errors.array());
 
+        console.log(userErrors);
         throw userErrors;
     }
 }

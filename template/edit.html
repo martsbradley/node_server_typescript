@@ -10,7 +10,21 @@ This the edit page
 
 <span>{{ errors.general }}</span>
 
-<form method="post" action="/user/save">
+
+
+
+Show other errors++++++
+<ul>
+    {% for item in errors %}
+       <li>{{ item }}</li>
+    {% endfor %}
+ </ul>
+ -----------------
+<span class="errors">{{errors.id}}</span>
+Show other errors=========
+
+
+<form method="post" action="/user">
     <div className="col-md-6 form-line">
         <div className="form-group">
             <label htmlFor="forename">Forename</label>

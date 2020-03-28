@@ -1,5 +1,6 @@
 import { Pool } from 'pg';
 import User from './user';
+import assert  from 'assert';
 
 export default class Database {
 
@@ -17,35 +18,48 @@ export default class Database {
 
   }
 
+  async createPatient(user: User): Promise<number>  {
+    assert(user.id === undefined);
 
+    const version = 0;
 
+    const res = await this.pool.query('insert into patient ' +
+                                      '(forename, surname, sex, dateofbirth, version) ' +
+                                      'values ($1, $2, $3, $4, $5) ' +
+                                      'returning id',
+                                      [user.forename, 
+                                      user.surname, 
+                                      user.sex, 
+                                      user.dob,
+                                      version]);
+    if (res.rowCount != 1) {
+        console.log(res);
+        throw {"general": "Database Error, unable to Save User"};
+    }
+    return res.rows[0];
+  }
 
-  async savePatient(data: User): Promise<boolean>  {
-    console.log("savePatient");
+  async updatePatient(user: User): Promise<boolean>  {
+    assert(user.id !== undefined);
 
     let result = false;
 
-    console.log(`Should update primarykey ${data.id} to ${data.forename} ${data.surname}`);
-
-    console.log(data);
-
+    console.log(`Should update primarykey ${user.id} to ${user.forename} ${user.surname}`);
     try {
         const res = await this.pool.query('update patient set ' +
                           'forename = $1,' +
                           'surname  = $2,' +
                           'sex      = $3 ' +
                           'WHERE id = $4',
-            [data.forename, data.surname, data.sex, data.id]);
+            [user.forename, user.surname, user.sex, user.id]);
 
-        console.log(`savePatient query updated ${res.rowCount} row(s)`);
-
+        console.log(`updatePatient ${res.rowCount}`);
         if (res.rowCount == 0) {
+          console.log(`throw error1`);
           throw {"general": "Database Error, unable to Save User"};
         }
     }catch (err) {
-
         console.log("Save failed " + err);
-
 
         throw {"general": "Database Error, unable to Save User"};
     }
@@ -129,7 +143,6 @@ async queryUser (id: number): Promise<User> {
   }
 
   closeDatabase(): void{ 
-      console.log("closing pool")
       this.pool.end()
       console.log("closed pool")
   }

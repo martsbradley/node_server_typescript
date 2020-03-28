@@ -13,28 +13,65 @@ export default class Routes {
         this.db = dab;
     }
 
-    async saveHandler(req: express.Request, res: express.Response) {
-        console.log(`hit save from ${req.header('Referer')}`);
-
+    async updatePatientHandler(req: express.Request, res: express.Response, next: express.NextFunction) {
         const user = req.body;
         try {
-            console.log(`Need to save "${user.surname}"`);
-            console.log(user)
+            console.log(`Referred from ${req.header('Referer')}\nNeed to update "${user.id}"`);
             checkValidationResults(req);
-            console.log("validation passed");
 
-            await this.db.savePatient(user);
+            if (user.forename === 'marty')
+               throw {};
+
+            await this.db.updatePatient(user);
+            console.log("Done waiting...");
         }
         catch (err) {
-            console.log("validation or logic failed");
+            console.log("Caught exception during updatePatientHandler");
+            console.log(err);
+            console.log(`error keys has ${Object.keys(err).length}`);
+            if (Object.keys(err).length === 0) {
+                /* The keys are the input fields from the html form
+                   and the catch all 'general' one.
+                   If there are no keys it means an unexpected error
+                   so use the express error handler to catch it.
+                   */
+                next(err);
+                return;
+            }
+
             return res.render('edit.html', {'user': user,
                                             'errors': err});
         }
 
-        return res.redirect('/user/list');
+        console.log("Calling redirect");
+        return res.redirect('/users/list');
     }
 
-    async editHandler (req: express.Request, res: express.Response) {
+    async createPatientHandler(req: express.Request, res: express.Response) {
+
+        const user = req.body;
+        let userId = undefined;
+        try {
+            //console.log(`Referred from ${req.header('Referer')}\nNeed to  "${user.forename}"`);
+            console.log(`createPatientHandler forname = "${user.forename}"`);
+            checkValidationResults(req);
+
+            console.log(`creating patient`);
+            console.log(user);
+            userId = await this.db.createPatient(user);
+            console.log(`created a patient with id ${userId}`);
+        }
+        catch (err) {
+            console.log("Caught exception during createPatientHandler");
+            console.log(err);
+            return res.render('edit.html', {'user': user,
+                                            'errors': err});
+        }
+
+        return res.redirect('/users/list');
+    }
+
+    async loadPatientHandler(req: express.Request, res: express.Response) {
 
         const errors = validationResult(req);
 
@@ -57,8 +94,8 @@ export default class Routes {
         }
     }
 
-    async listHandler(req: express.Request,
-                    res: express.Response) {
+    async listPatients(req: express.Request,
+                       res: express.Response) {
 
         const users = await this.db.queryAllPatients();
 

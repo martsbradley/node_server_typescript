@@ -24,6 +24,22 @@ describe('Database', () => {
     return db.queryAllPatients().then(data => expect(data).toStrictEqual([]));
   })
 
+  it('createPatient', async () => {
+    const id :number = undefined;
+
+    const user = new User (id, "m", "b", "m", new Date()); 
+
+    let rows = [99];
+    let dbresult = {
+      rowCount: 1,
+      rows: rows
+    };
+
+    pool.query.mockResolvedValueOnce(dbresult);
+
+    return db.createPatient(user).then(data => expect(data).toStrictEqual(99));
+  });
+
   it('one row', async () => {
 
     const date = new Date();
@@ -39,6 +55,9 @@ describe('Database', () => {
 
     return db.queryAllPatients().then(data => expect(data).toStrictEqual([u]));
   })
+
+
+
   it('database down', async () => {
     pool.query.mockImplementation(() => {
       throw {"pg": "some unknown issue from PostGreSQL" }});
