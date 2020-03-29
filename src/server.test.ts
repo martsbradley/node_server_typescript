@@ -9,7 +9,7 @@ describe('Server',  function() {
 
     const newUserURL    = '/user/new';
     const updateUserURL = '/user';
-    const listUsersURL  = '/users/list';
+    const listUsersURL  = '/user/list';
 
     beforeAll(() => {
         db = new Database();
@@ -81,7 +81,7 @@ describe('Server',  function() {
                 console.log(res.text);
                 expect(res.status).toEqual(302);
                 expect(res.header['content-type']).toEqual("text/plain; charset=utf-8");
-                expect(res.text).toContain('Found. Redirecting to /users/list');
+                expect(res.text).toContain('Found. Redirecting to /user/list');
                 done();
             });
     });
