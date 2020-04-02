@@ -3,7 +3,9 @@ const MockExpressResponse = require('mock-express-response');
 import UserRoutes from './userRouter';
 import User from './user';
 import Database from './database';
-
+import express from 'express';
+import request from 'supertest';
+import bodyParser from 'body-parser';
 
 const queryData ={id:1,
                 forename: "Martin",
@@ -24,67 +26,48 @@ jest.mock('./database', () => {
   });
 });
 
+function redirectUserList(done: Function): express.Response {
+  const response = new MockExpressResponse();
+  response.redirect = function(viewname: any): void {
+    console.log("Got here. .........");
+    expect(viewname).toEqual('/user/list');
+    done();
+  };
+  return response;
+}
+
+
 describe("UserRoutes", () => {
+
+  const db: Database = new Database();
+  const userRoutes  = new UserRoutes(db);
 
   it("Update Patient", async (done) => {
 
-    const db: Database = new Database();
+    const response = redirectUserList(done);
+
     const request = new MockExpressRequest();
-    const response = new MockExpressResponse({
-
-      redirect: function(url: any) {
-              console.log("here.........");
-              console.log(url);
-        }
-    });
-
-    response.redirect = function(viewname: any) {
-          console.log("Got here. .........");
-          expect(viewname).toEqual('/user/list');
-          done();
-    };
-
-    //request.header = () => {return 'martyok';};
-    request.body   = {id : 24,
+    //request.body   = {id : 24,
+    request.body   = {
                       forename : 'xxxx'};
 
-    const userRoutes  = new UserRoutes(db);
     await userRoutes.updatePatientHandler(request, response, () =>{});
   });
 
   it("Create User", async (done) => {
+    const response = redirectUserList(done);
 
-    const db: Database = new Database();
-    const userRoutes  = new UserRoutes(db);
     const request = new MockExpressRequest();
-    const response = new MockExpressResponse();
-
-    response.redirect = function(viewname: any) {
-          console.log("Got here. .........");
-          expect(viewname).toEqual('/user/list');
-      done();
-    };
-
-    request.header = () => {return 'martyok';};
     request.body   = {forename : 'xxxx'};
 
     await userRoutes.createPatientHandler(request, response);
   });
 
+
   it("Update User", async (done) => {
-
-    const db: Database = new Database();
-    const userRoutes  = new UserRoutes(db);
     const request = new MockExpressRequest();
-    const response = new MockExpressResponse();
+    const response = redirectUserList(done);
 
-    response.redirect = function(viewname: any) {
-      console.log("Got here. .........");
-      expect(viewname).toEqual('/user/list');
-      done();
-    };
-
-    request.header = () => {return 'martyok';};
     request.body   = {forename : 'xxxx'};
 
     await userRoutes.updatePatientHandler(request, response, () => {});
@@ -92,7 +75,6 @@ describe("UserRoutes", () => {
 
   it("listHandler one user", async (done) => {
 
-    const db: Database = new Database();
     const request = new MockExpressRequest();
     const response = new MockExpressResponse({
 
@@ -103,8 +85,33 @@ describe("UserRoutes", () => {
       }
     });
 
+    await userRoutes.listPatients(request, response);
+  });
+
+  it("Positive UserRouter update patient", async (done) => {
 
     const userRoutes  = new UserRoutes(db);
-    await userRoutes.listPatients(request, response);
+    const app = express();
+
+    app.use(express.urlencoded({ extended: true }));
+    app.use(bodyParser.json());
+    app.use('/user', new UserRoutes(new Database()).router);
+
+    request(app)
+            .post("/user")
+            .set('Accept', 'application/json')
+            .send({id: 22,
+                   forename: 'Bradley', 
+                   surname: 'Buddy',
+                   sex: 'Male',
+                   dob: 'Sat Jan 01 2011 00:00:00'})
+        .end(function(err, res) {
+            // The supertest header looks different.
+            expect(res.status).toEqual(302);
+            expect(res.header['location']).toEqual("/user/list");
+            console.log(`text is '${res.text}'`);
+
+            done();
+        });
   });
 });

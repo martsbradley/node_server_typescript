@@ -1,5 +1,4 @@
 import express from 'express';
-import Routes from './routes';
 import Database  from './database';
 import { checkSchema } from 'express-validator';
 import {idParamSchema,checkValidationResults, UserSchema, NewUserSchema} from './validation';
@@ -38,6 +37,11 @@ export default class UserRouter {
         console.log("Is this Post a cancel")
 
         const body = req.body;
+        console.log("body is");
+        console.log(body);
+        console.log("req keys");
+        console.log(Object.keys(req));
+
         if (body['Cancel'] === 'Cancel') {
             console.log("Cancel redirect...")
             res.redirect(req.baseUrl + '/list');
@@ -64,7 +68,9 @@ export default class UserRouter {
             checkValidationResults(req);
 
             if (user.forename === 'marty')
-               throw {};
+            {
+                throw {};
+            }
 
             await this.db.updatePatient(user);
             console.log("Done waiting...");
