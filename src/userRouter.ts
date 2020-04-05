@@ -1,8 +1,9 @@
 import express from 'express';
-import Database  from './database';
+import Database , {MedicineResult} from './database';
 import { checkSchema } from 'express-validator';
 import {idParamSchema,checkValidationResults, UserSchema, NewUserSchema} from './validation';
 import { validationResult } from 'express-validator';
+import PageInfo from './pageInfo';
 
 export default class UserRouter {
     router: express.Router;
@@ -31,16 +32,19 @@ export default class UserRouter {
         this.router.post('/', 
                          checkSchema(UserSchema),
                          this.updatePatientHandler.bind(this));
+
+        this.router.get('/prescription/new',
+                      this.createPrescriptionForm.bind(this));
     }
 
     cancelHandler(req: express.Request, res: express.Response, next: express.NextFunction): void {
         console.log("Is this Post a cancel")
 
         const body = req.body;
-        console.log("body is");
-        console.log(body);
-        console.log("req keys");
-        console.log(Object.keys(req));
+      //console.log("body is");
+      //console.log(body);
+      //console.log("req keys");
+      //console.log(Object.keys(req));
 
         if (body['Cancel'] === 'Cancel') {
             console.log("Cancel redirect...")
@@ -49,6 +53,24 @@ export default class UserRouter {
             console.log("Continue the Post processing.")
             next();
         }
+    }
+
+
+    async createPrescriptionForm(req: express.Request, res: express.Response): Promise<void> {
+        const { page = 1, pageSize = 5, nameFilter= '' } = req.query;
+
+        const pageInfo = new PageInfo(page, pageSize, nameFilter);
+        
+        console.log("making user form...");
+        const user: object = { dob: 'Sat Mar 01 2020 00:00:00'};
+
+        const medicines: MedicineResult = await this.db.loadMedicines(pageInfo);
+
+        pageInfo.dataSize = medicines.total;
+
+        return res.render('prescription_new.html', {'medicines': medicines.data,
+                                                    'pageInfo': pageInfo,
+                                                    'totalMeds': medicines.total});
     }
 
     async createPatientForm(req: express.Request, res: express.Response): Promise<void> {

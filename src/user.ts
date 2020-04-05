@@ -1,23 +1,47 @@
 //import { number, string } from "joi";
 
-export class Prescription {
+export class Medicine {
     medicineId: number;
+    name: string;
+    manufacturer: string;
+    deliveryMethod: string;
+
+    constructor(medicineId: number,
+                name: string,
+                manufacturer: string,
+                deliveryMethod: string){
+        this.medicineId = medicineId;
+        this.name = name;
+        this.manufacturer = manufacturer;
+        this.deliveryMethod = deliveryMethod;
+    }
+}
+
+export class Prescription {
     startDate: Date;
     endDate: Date;
     amount: string;
-    name: string;
+    medicine: Medicine;
 
     constructor(medicineId: number,
                 startDate: Date,
                 endDate: Date,
                 amount: string,
                 name: string) {
-        this.medicineId = medicineId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.amount = amount;
-        this.name = name;
+        this.medicine = new Medicine(medicineId, name, '','');
     }
+
+    get medicineId(): number{
+        return this.medicine.medicineId;
+    }
+
+    get name(): string {
+        return this.medicine.name;
+    }
+
 
     get startDateStr(): string {
         const res = this.startDate.toISOString().slice(0, 10);

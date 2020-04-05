@@ -7,9 +7,10 @@ describe('Server',  function() {
     let  db: Database;
     let  server: Server = null;
 
-    const newUserURL    = '/user/new';
-    const updateUserURL = '/user';
-    const listUsersURL  = '/user/list';
+    const newUserURL         = '/user/new';
+    const addPrescriptionURL = '/user/prescription/new';
+    const updateUserURL      = '/user';
+    const listUsersURL       = '/user/list';
 
     beforeAll(() => {
         db = new Database();
@@ -32,6 +33,17 @@ describe('Server',  function() {
                 expect(res.text).toContain('<h1>New Patient</h1>');
                 expect(res.header['content-type']).toEqual("text/html; charset=utf-8");
                 expect(res.status).toEqual(200);
+                done();
+            });
+    });
+
+    it('Positive: Display New Prescription Page', function(done) {
+        request(server.express)
+            .get(addPrescriptionURL)
+            .end(function(err, res) {
+                expect(res.status).toEqual(200);
+                expect(res.text).toContain('<h1>Add Prescription</h1>');
+                expect(res.header['content-type']).toEqual("text/html; charset=utf-8");
                 done();
             });
     });

@@ -1,6 +1,10 @@
 import { Pool } from 'pg';
-import User, { Prescription } from './user';
+import User, { Medicine, Prescription } from './user';
 import assert  from 'assert';
+import PageInfo, {PageResult} from './pageInfo';
+
+export class MedicineResult extends PageResult<Medicine>{
+}
 
 export default class Database {
 
@@ -147,6 +151,40 @@ async queryUser (id: number): Promise<User> {
         throw {"general": "Database Error, unable to Query User"};
     }
     return users;
+  }
+
+//export class PageResult<T> {
+  async loadMedicines(pageInfo: PageInfo): Promise<MedicineResult> {
+    let result: MedicineResult ;
+
+    try {
+      const query = 'SELECT * from medicine order by id ' +
+                     'LIMIT $1 OFFSET $2';
+
+      const dbresult = await this.pool.query(query, 
+                                            [pageInfo.limit, 
+                                             pageInfo.offset]);
+      const meds: Medicine[] = [];
+      for (const i in dbresult.rows) {
+          const row = dbresult.rows[i];
+          const med = new Medicine(row.id,
+                                   row.name,
+                                   row.manufacturer,
+                                   row.delivery_method);
+          meds.push(med);
+      }
+
+      const allresult = await this.pool.query("select count(*) as count from medicine");
+      const count = allresult.rows[0].count;
+      //console.log(`There are ${count} medicines `)
+
+      result = new MedicineResult(meds, count);
+    }
+    catch (error) {
+        console.log(error);
+        throw {"general": "Database Error, unable to Query Medicine"};
+    }
+    return result;
   }
 
   closeDatabase(): void{ 
