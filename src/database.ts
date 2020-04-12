@@ -1,10 +1,8 @@
 import { Pool } from 'pg';
-import User, { Medicine, Prescription } from './user';
+import User, { Medicine, Prescription, MedicineResult, PatientResult } from './user';
 import assert  from 'assert';
 import PageInfo, {PageResult} from './pageInfo';
 
-export class MedicineResult extends PageResult<Medicine>{
-}
 
 export default class Database {
 
@@ -130,12 +128,18 @@ async queryUser (id: number): Promise<User> {
     return user;
 }
 
-  async queryAllPatients(): Promise<User[]> {
-    const users: User[] = [];
+  async queryAllPatients(pageInfo: PageInfo): Promise<PatientResult> {
+    let result: PatientResult;
 
+    console.log(`paging limit is ${pageInfo.limit} offset ${pageInfo.offset}`)
     try {
-      const dbresult = await this.pool.query('SELECT * from patient order by id');
+      const query = 'SELECT * from patient order by id ' + 
+                    'LIMIT $1 OFFSET $2';
 
+      const dbresult = await this.pool.query(query, 
+                                            [pageInfo.limit, 
+                                             pageInfo.offset]);
+      const users: User[] = [];
       for (const i in dbresult.rows) {
           const row = dbresult.rows[i];
           const user = new User(row.id,
@@ -145,12 +149,18 @@ async queryUser (id: number): Promise<User> {
                                 row.dateofbirth);
         users.push(user);
       }
+      const allresult = await this.pool.query("select count(*) as count from patient");
+
+      const count = allresult.rows[0].count;
+
+      result = new PatientResult(users, count);
     }
     catch (error) {
         console.log(error);
         throw {"general": "Database Error, unable to Query User"};
     }
-    return users;
+
+    return result;
   }
 
 //export class PageResult<T> {

@@ -35,7 +35,7 @@
 
 
         
-        <table class="table table-bordered">
+        <table class="table table-bordered users">
         {% for user in users %}
         <tr>
             <td class="d-none d-sm-table-cell"><a href='/user?id={{ user.id}}'>{{user.id}}</a></td>
@@ -45,7 +45,41 @@
             <td class="d-none d-sm-table-cell">{{ user.sex }}</td>
         </tr>
         {% endfor %}
+
+          {% for i in range(users | length, pageInfo.pageSize) -%}
+          <tr>
+              <td class="d-none d-sm-table-cell">  </td>
+              <td> </td>
+              <td> </td>
+              <td class="d-none d-sm-table-cell">  </td>
+              <td class="d-none d-sm-table-cell">  </td>
+          </tr>
+          {%- endfor %}
         </table>
+
+
+        <ul class="pagination">
+          <li class="page-item {% if pageInfo.navFirstPage == pageInfo.page%} active {% endif %}">
+            <a class="page-link" 
+                href="?page={{ pageInfo.navFirstPage }}" aria-label="Previous">
+              <span aria-hidden="true">{{ pageInfo.navFirstPage}}</span>
+              <span class="sr-only">Previous</span>
+            </a>
+          </li> <!--&laquo; &raquo; -->
+          {% for p in pageInfo.navPages%}
+            <li class="page-item {% if p == pageInfo.page%} active {% endif %}">
+              <a class="page-link" href="?page={{p}}">{{p}}</a>
+            </li>
+          {% endfor %}
+          <li class="page-item {% if pageInfo.navLastPage == pageInfo.page%} active {% endif %}">
+            <a class="page-link" 
+               href="?page={{ pageInfo.navLastPage }}" aria-label="Next">
+              <span aria-hidden="true">{{ pageInfo.navLastPage }}</span>
+              <span class="sr-only">Next</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
 
         </div>
     </body>

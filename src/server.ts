@@ -3,7 +3,7 @@ import Database  from './database';
 import { checkSchema } from 'express-validator';
 import UserRoutes from './userRouter';
 
-import { idParamSchema, NewUserSchema, UserSchema} from './validation';
+import { idParamSchema, NewUserSchema, UserSchema} from './schema';
 
 export default class Server {
 

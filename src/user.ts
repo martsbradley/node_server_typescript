@@ -1,4 +1,4 @@
-//import { number, string } from "joi";
+import { PageResult } from './pageInfo';
 
 export class Medicine {
     medicineId: number;
@@ -86,4 +86,9 @@ export default class User {
         //console.log(`yyy dateOfBirth is ... ${res}`);
         return res;
     }
+}
+
+export class MedicineResult extends PageResult<Medicine>{
+}
+export class PatientResult extends PageResult<User>{
 }

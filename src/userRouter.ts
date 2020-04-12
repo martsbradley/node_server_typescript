@@ -1,12 +1,15 @@
 import express from 'express';
-import Database , {MedicineResult} from './database';
+import Database  from './database';
 import { checkSchema } from 'express-validator';
-import {idParamSchema,checkValidationResults, UserSchema, NewUserSchema} from './validation';
+import Validation from './validation';
+import {idParamSchema,UserSchema, NewUserSchema} from './schema';
 import { validationResult } from 'express-validator';
 import PageInfo from './pageInfo';
+import {MedicineResult} from './user';
 
 export default class UserRouter {
     router: express.Router;
+    validation: Validation = new Validation();
 
     db: Database;
     constructor(db: Database) {
@@ -68,6 +71,8 @@ export default class UserRouter {
 
         pageInfo.dataSize = medicines.total;
 
+        res.set('Cache-Control', 'max-age=300, private');
+
         return res.render('prescription_new.html', {'medicines': medicines.data,
                                                     'pageInfo': pageInfo,
                                                     'totalMeds': medicines.total});
@@ -87,7 +92,7 @@ export default class UserRouter {
         console.log(user);
         try {
             console.log(`Referred from ${req.header('Referer')}\nNeed to update "${user.id}"`);
-            checkValidationResults(req);
+            this.validation.checkValidationResults(req);
 
             if (user.forename === 'marty')
             {
@@ -148,7 +153,6 @@ export default class UserRouter {
         try {
             //console.log(`Referred from ${req.header('Referer')}\nNeed to  "${user.forename}"`);
             console.log(`createPatientHandler forname = "${user.forename}"`);
-            checkValidationResults(req);
 
             console.log(`creating patient`);
             console.log(user);
@@ -170,15 +174,15 @@ export default class UserRouter {
 
     async listPatients(req: express.Request,
                        res: express.Response): Promise<void> {
+        const { page = 1, pageSize = 5, nameFilter= '' } = req.query;
 
-        const users = await this.db.queryAllPatients();
+        const pageInfo = new PageInfo(page, pageSize, nameFilter);
 
-        const data = {
-            'mynames': ['joan', 'paul', 'lisa'],
-            'firstName': 'Marty',
-            'users': users,
-            'lastName': 'Bradley',
-        };
+        const patients = await this.db.queryAllPatients(pageInfo);
+        pageInfo.dataSize =  patients.total;
+
+        const data = { 'users': patients.data, 
+                       'pageInfo': pageInfo};
 
         return res.render('home.html', data);
     }

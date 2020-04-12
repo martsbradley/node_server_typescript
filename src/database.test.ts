@@ -1,6 +1,7 @@
 import Database  from './database';
 import { Pool } from 'pg';
 import User from './user';
+import PageInfo from './pageInfo';
 
 jest.mock('pg', () => {
   const mPool = {
@@ -20,17 +21,14 @@ describe('Database', () => {
     db  = new Database();
   });
 
-  it('no rows', async () => {
-    return db.queryAllPatients().then(data => expect(data).toStrictEqual([]));
-  })
 
   it('createPatient', async () => {
-    const id :number = undefined;
+    const id: number = undefined;
 
     const user = new User (id, "m", "b", "m", new Date()); 
 
-    let rows = [99];
-    let dbresult = {
+    const rows: number[] = [99];
+    const dbresult = {
       rowCount: 1,
       rows: rows
     };
@@ -40,7 +38,17 @@ describe('Database', () => {
     return db.createPatient(user).then(data => expect(data).toStrictEqual(99));
   });
 
-  it('one row', async () => {
+  it('queryPatient no rows', async () => {
+    const pageInfo = new PageInfo(1,5, "");
+    pool.query.mockResolvedValueOnce({ rows: [],           rowCount: 0 });
+    pool.query.mockResolvedValueOnce({ rows: [{count: 0}], rowCount: 1 });
+    return db.queryAllPatients(pageInfo)
+             .then(patientResult => {
+                    expect(patientResult.data).toStrictEqual([])
+                    expect(patientResult.total).toEqual(0)});
+  })
+
+  it('queryPatient one row', async () => {
 
     const date = new Date();
     const data = [ {id: 1,
@@ -50,10 +58,15 @@ describe('Database', () => {
                     dateofbirth: date}];
 
     pool.query.mockResolvedValueOnce({ rows: data, rowCount: 0 });
+    pool.query.mockResolvedValueOnce({ rows: [{count: 120}], rowCount: 1 });
 
     const u = new User(1, "m", "b", "m", date);
 
-    return db.queryAllPatients().then(data => expect(data).toStrictEqual([u]));
+    const pageInfo = new PageInfo(1,5, "");
+    return db.queryAllPatients(pageInfo)
+             .then(patientResult => 
+                {expect(patientResult.data).toStrictEqual([u])
+                 expect(patientResult.total).toEqual(120)});
   })
 
 
@@ -62,9 +75,10 @@ describe('Database', () => {
     pool.query.mockImplementation(() => {
       throw {"pg": "some unknown issue from PostGreSQL" }});
 
-    return db.queryAllPatients().
+    const pageInfo = new PageInfo(1,5, "");
+    return db.queryAllPatients(pageInfo).
           catch(error => 
             expect(error.general).
                   toStrictEqual("Database Error, unable to Query User"));
   })
-})
+});

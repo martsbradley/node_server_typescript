@@ -104,3 +104,5 @@ body {
     transform: rotate(360deg);
   }
 }
+
+.users td { height: 45px; }

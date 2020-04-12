@@ -1,100 +1,41 @@
 import express from 'express';
-import { Location, validationResult } from 'express-validator';
-
+import { validationResult } from 'express-validator';
 
 type data = { text: string; id: number };
 
 interface MyType {
     [x: string]: string;
 }
+export default class Validation {
 
+    // This maps from the express-validator results into
+    // something that is easier the nunjucks template to consume 
+    private errorMapper(keys: string[], 
+                        errorList: {param: string; msg: string}[]): MyType {
+        const result: MyType = {};
 
-// This maps from the express-validator results into
-// something that is easier the nunjucks template to consume 
-function errorMapper(keys: string[], 
-                     errorList: {param: string; msg: string}[]): MyType 
-{
-    const result: MyType = {};
+        errorList.map(e => {
+            if (keys.indexOf(e.param) != -1) {
+            result[e.param] =  e.msg;
+            }
+        });
+        return result;
+    }
 
-    errorList.map(e => {
-        if (keys.indexOf(e.param) != -1) {
-           result[e.param] =  e.msg;
+    checkValidationResults(req: express.Request): void {
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            console.log("Validation issues!!!");
+
+            console.log(errors);
+
+            const keys = Object.keys(req.body);
+
+            const userErrors = this.errorMapper(keys, errors.array());
+
+            console.log(userErrors);
+            throw userErrors;
         }
-    });
-    return result;
-}
-
-//const body: Location= 'body';
-
-const nameCharacters = "'.ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ";
-
-
-function nameValid(part: string, minLen: number, maxLen: number): object {
-    return {
-        in: 'body' as Location,
-        isAlpha: { 
-            errorMessage: 'Please enter alphabetic names',
-        },
-        isLength: {
-            errorMessage: `Please enter between ${minLen} and ${maxLen} characters`,
-            options: { min: minLen,
-                       max: maxLen }
-        },
-        trim: {
-          options: " "
-        }
-    };
-}
-
-const validId = { 
-    isInt: {
-        options:{ min: 1, max: 30},
-        errorMessage: 'Id out of range'
-    }
-};
-
-export const idParamSchema =  {
-    id: {
-        in: 'query' as Location,
-        ...validId
-    }
-};
-
-const inBody = {
-    in: 'body' as Location
-}
-
-export const NewUserSchema = {
-
-    'forename': nameValid("forname", 1, 20),
-    'surname':  nameValid("surname", 1, 50),
-    'sex': {
-        ...inBody,
-        isIn: {options: [['Male', 'Female']] },
-    }
-};
-
-export const UserSchema = {
-    id: {
-        ...inBody,
-        ...validId
-    },
-    ...NewUserSchema
-}
-
-export function checkValidationResults(req: express.Request): void{
-    const errors = validationResult(req);
-
-    if (!errors.isEmpty()) {
-        console.log("Validation issues!!!");
-
-        console.log(errors);
-
-        const keys = Object.keys(req.body);
-
-        const userErrors = errorMapper(keys, errors.array());
-
-        console.log(userErrors);
-        throw userErrors;
     }
 }
