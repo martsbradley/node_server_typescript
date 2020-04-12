@@ -10,9 +10,9 @@ export const nameValid = (part: string, minLen: number, maxLen: number): object 
             errorMessage: 'Please enter alphabetic names',
         },
         isLength: {
-            errorMessage: `Please enter between ${minLen} and ${maxLen} characters`,
+            errorMessage: `${part} must be between ${minLen} and ${maxLen} characters long`,
             options: { min: minLen,
-                    max: maxLen }
+                       max: maxLen }
         },
         trim: {
         options: " "
@@ -40,11 +40,18 @@ export const inBody = {
 
 export const NewUserSchema = {
 
-    'forename': nameValid("forname", 1, 20),
+    'forename': nameValid("forename", 1, 20),
     'surname':  nameValid("surname", 1, 50),
     'sex': {
         ...inBody,
         isIn: {options: [['Male', 'Female']] },
+    },
+    'dob': {
+        ...inBody,
+        isLength: {
+            errorMessage: `what dob?`,
+            options: { min: 10,
+                       max: 10 }}
     }
 };
 

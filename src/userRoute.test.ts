@@ -123,31 +123,6 @@ describe("UserRouter", () => {
     await userRouter.listPatients(request, response);
   });
 
-  it("Positive UserRouter update patient supertest", async (done) => {
-
-    const app = express();
-
-    app.use(express.urlencoded({ extended: true }));
-    app.use(bodyParser.json());
-    app.use('/user', new UserRouter(new Database()).router);
-
-    request(app)
-            .post("/user")
-            .set('Accept', 'application/json')
-            .send({id: 28,
-                   forename: 'Bradley', 
-                   surname: 'Buddy',
-                   sex: 'Male',
-                   dob: 'Sat Jan 01 2011 00:00:00'})
-        .end(function(err, res) {
-            // The supertest header looks different.
-            expect(res.status).toEqual(302);
-            expect(res.header['location']).toEqual("/user/list");
-            console.log(`text is '${res.text}'`);
-
-            done();
-        });
-  });
 
   it("UserRouter Postive Update Patient", async (done) => {
 

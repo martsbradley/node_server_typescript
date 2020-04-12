@@ -2,9 +2,10 @@ import { Pool } from 'pg';
 import User, { Medicine, Prescription, MedicineResult, PatientResult } from './user';
 import assert  from 'assert';
 import PageInfo, {PageResult} from './pageInfo';
+import Store from './store';
 
 
-export default class Database {
+export default class Database implements Store {
 
   pool: Pool;
 

@@ -6,13 +6,14 @@ import {idParamSchema,UserSchema, NewUserSchema} from './schema';
 import { validationResult } from 'express-validator';
 import PageInfo from './pageInfo';
 import {MedicineResult} from './user';
+import Store from './store';
 
 export default class UserRouter {
     router: express.Router;
     validation: Validation = new Validation();
+    db: Store;
 
-    db: Database;
-    constructor(db: Database) {
+    constructor(db: Store) {
         this.router = express.Router();
         this.db = db;
 
@@ -100,7 +101,7 @@ export default class UserRouter {
             }
 
             await this.db.updatePatient(user);
-            console.log("Done waiting...");
+            console.log("Finished updatePatientHandler processing");
         }
         catch (err) {
             console.log("Caught exception during updatePatientHandler");
