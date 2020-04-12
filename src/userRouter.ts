@@ -95,11 +95,6 @@ export default class UserRouter {
             console.log(`Referred from ${req.header('Referer')}\nNeed to update "${user.id}"`);
             this.validation.checkValidationResults(req);
 
-            if (user.forename === 'marty')
-            {
-                throw {};
-            }
-
             await this.db.updatePatient(user);
             console.log("Finished updatePatientHandler processing");
         }
@@ -147,13 +142,16 @@ export default class UserRouter {
         }
     }
 
-    async createPatientHandler(req: express.Request, res: express.Response): Promise<void> {
-
+    async createPatientHandler(req: express.Request, 
+                               res: express.Response, 
+                               next: express.NextFunction): Promise<void> {
         const user = req.body;
         let userId = undefined;
         try {
             //console.log(`Referred from ${req.header('Referer')}\nNeed to  "${user.forename}"`);
             console.log(`createPatientHandler forname = "${user.forename}"`);
+
+            this.validation.checkValidationResults(req);
 
             console.log(`creating patient`);
             console.log(user);
@@ -164,9 +162,18 @@ export default class UserRouter {
             console.log("Caught exception during createPatientHandler");
             console.log(err);
 
-                            //patient_new.html
-            return res.render('edit.html', {'user': user,
-                                            'errors': err});
+            console.log(`error keys has ${Object.keys(err).length}`);
+            if (Object.keys(err).length === 0) {
+                /* The keys are the input fields from the html form
+                   and the catch all 'general' one.
+                   If there are no keys it means an unexpected error
+                   so use the express error handler to catch it.
+                   */
+                next(err);
+                return;
+            }
+            return res.render('patient_new.html', {'user': user,
+                                                   'errors': err});
         }
 
         return res.redirect('/user/list');

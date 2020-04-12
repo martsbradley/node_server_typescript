@@ -69,7 +69,7 @@ describe("UserRouter", () => {
 
     const response = redirectUserList(done);
 
-    await userRouter.createPatientHandler(request, response);
+    await userRouter.createPatientHandler(request, response, () => {});
   });
 
 
