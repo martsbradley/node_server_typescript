@@ -66,7 +66,6 @@ export default class UserRouter {
         const pageInfo = new PageInfo(page, pageSize, nameFilter);
         
         console.log("making user form...");
-        const user: object = { dob: 'Sat Mar 01 2020 00:00:00'};
 
         const medicines: MedicineResult = await this.db.loadMedicines(pageInfo);
 
@@ -81,8 +80,19 @@ export default class UserRouter {
 
     async createPatientForm(req: express.Request, res: express.Response): Promise<void> {
         console.log("making user form...");
-        const user: object = { dob: 'Sat Mar 01 2020 00:00:00'};
+        const user: object = { sex: 'Male', 
+                               dateOfBirth: 'Sat Mar 01 2020 00:00:00'};
         return res.render('patient_new.html', {'user': user});
+    }
+
+    /* The keys are the input fields from the html form
+        and the catch all 'general' one.
+        If there are no keys it means an unexpected error
+        so use the express error handler to catch it.
+        */
+    private unhandledError(err: object): boolean {
+        console.log(err);
+        return (Object.keys(err).length === 0);
     }
 
     async updatePatientHandler(req: express.Request, 
@@ -99,21 +109,38 @@ export default class UserRouter {
             console.log("Finished updatePatientHandler processing");
         }
         catch (err) {
-            console.log("Caught exception during updatePatientHandler");
-            console.log(err);
-            console.log(`error keys has ${Object.keys(err).length}`);
-            if (Object.keys(err).length === 0) {
-                /* The keys are the input fields from the html form
-                   and the catch all 'general' one.
-                   If there are no keys it means an unexpected error
-                   so use the express error handler to catch it.
-                   */
+            if (this.unhandledError(err)){
                 next(err);
                 return;
             }
 
             return res.render('edit.html', {'user': user,
                                             'errors': err});
+        }
+
+        return res.redirect('/user/list');
+    }
+
+    async createPatientHandler(req: express.Request, 
+                               res: express.Response, 
+                               next: express.NextFunction): Promise<void> {
+        const user = req.body;
+        console.log("createPatientHandler");
+        console.log(user);
+        try {
+
+            this.validation.checkValidationResults(req);
+
+            const userId = await this.db.createPatient(user);
+            console.log(`created a patient with id ${userId}`);
+        }
+        catch (err) {
+            if (this.unhandledError(err)){
+                next(err);
+                return;
+            }
+            return res.render('patient_new.html', {'user': user,
+                                                   'errors': err});
         }
 
         return res.redirect('/user/list');
@@ -141,44 +168,6 @@ export default class UserRouter {
             return res.render('error.html');
         }
     }
-
-    async createPatientHandler(req: express.Request, 
-                               res: express.Response, 
-                               next: express.NextFunction): Promise<void> {
-        const user = req.body;
-        let userId = undefined;
-        try {
-            //console.log(`Referred from ${req.header('Referer')}\nNeed to  "${user.forename}"`);
-            console.log(`createPatientHandler forname = "${user.forename}"`);
-
-            this.validation.checkValidationResults(req);
-
-            console.log(`creating patient`);
-            console.log(user);
-            userId = await this.db.createPatient(user);
-            console.log(`created a patient with id ${userId}`);
-        }
-        catch (err) {
-            console.log("Caught exception during createPatientHandler");
-            console.log(err);
-
-            console.log(`error keys has ${Object.keys(err).length}`);
-            if (Object.keys(err).length === 0) {
-                /* The keys are the input fields from the html form
-                   and the catch all 'general' one.
-                   If there are no keys it means an unexpected error
-                   so use the express error handler to catch it.
-                   */
-                next(err);
-                return;
-            }
-            return res.render('patient_new.html', {'user': user,
-                                                   'errors': err});
-        }
-
-        return res.redirect('/user/list');
-    }
-
 
     async listPatients(req: express.Request,
                        res: express.Response): Promise<void> {

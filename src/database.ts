@@ -26,6 +26,10 @@ export default class Database implements Store {
 
     const version = 0;
 
+    console.log(`Inserting user with ${user.dateOfBirth}`);
+    const now = new Date();
+    console.log(`${now}`);
+
     const res = await this.pool.query('insert into patient ' +
                                       '(forename, surname, sex, dateofbirth, version) ' +
                                       'values ($1, $2, $3, $4, $5) ' +
@@ -33,7 +37,7 @@ export default class Database implements Store {
                                       [user.forename, 
                                       user.surname, 
                                       user.sex, 
-                                      user.dob,
+                                      user.dateOfBirth,
                                       version]);
     if (res.rowCount != 1) {
         console.log(res);
@@ -47,7 +51,7 @@ export default class Database implements Store {
 
     let result = false;
 
-    console.log(`Update Patient ${user.id} to ${user.forename} ${user.surname} ${user.dob}`);
+    console.log(`Update Patient ${user.id} to ${user.forename} ${user.surname} ${user.dateOfBirth}`);
 
     try {
         const res = await this.pool.query('update patient set ' +
@@ -56,7 +60,7 @@ export default class Database implements Store {
                           'sex         = $3,' +
                           'dateofbirth = $4 ' +
                           'WHERE id = $5',
-            [user.forename, user.surname, user.sex, user.dob, user.id]);
+            [user.forename, user.surname, user.sex, user.dateOfBirth, user.id]);
 
         console.log(`updatePatient ${res.rowCount}`);
         if (res.rowCount == 0) {
@@ -143,6 +147,7 @@ async queryUser (id: number): Promise<User> {
       const users: User[] = [];
       for (const i in dbresult.rows) {
           const row = dbresult.rows[i];
+          console.log(`${row.forename} -> ${row.dateofbirth}`);
           const user = new User(row.id,
                                 row.forename,
                                 row.surname,

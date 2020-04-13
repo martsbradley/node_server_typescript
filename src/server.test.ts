@@ -87,7 +87,7 @@ describe('Server',  function() {
                    forename: 'Some', 
                    surname: 'Buddy',
                    sex: 'Male',
-                   dob: '2011-10-01'})
+                   dateOfBirth: '2011-10-01'})
             .end(function(err, res) {
                 console.log("ok checking now");
                 console.log(res.text);

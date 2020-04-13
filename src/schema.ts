@@ -46,10 +46,10 @@ export const NewUserSchema = {
         ...inBody,
         isIn: {options: [['Male', 'Female']] },
     },
-    'dob': {
+    'dateOfBirth': {
         ...inBody,
         isLength: {
-            errorMessage: `what dob?`,
+            errorMessage: `Date Of Birth is required`,
             options: { min: 10,
                        max: 10 }}
     }

@@ -58,7 +58,7 @@ export default class User {
     forename: string;
     surname: string;
     sex: string;
-    dob: Date;
+    _dateOfBirth: Date;
 
     prescriptions: Prescription[] = [];
 
@@ -66,24 +66,36 @@ export default class User {
                 forename: string,
                 surname: string,
                 sex: string,
-                dob: Date) 
+                dateOfBirth: Date) 
     {
         this.id = id;
         this.forename = forename;
         this.surname = surname;
         this.sex = sex;
-        this.dob = dob;
-      //const res = this.dob.toISOString().slice(0, 10);
-      //console.log(`XXX dateOfBirth is ... ${res}`);
+        this._dateOfBirth = dateOfBirth;
+    }
+
+    copy(): User { 
+        const copy = new User( this.id,
+                               this.forename,
+                               this.surname,
+                               this.sex,
+                               new Date(this.dateOfBirth));
+        return copy
     }
 
     addPrescription(p: Prescription): void {
         this.prescriptions.push(p);
     }
 
+    set dateOfBirth(dateOfBirth: string) {
+        this._dateOfBirth = new Date(dateOfBirth);
+    }
+
     get dateOfBirth(): string {
-        const res = this.dob.toISOString().slice(0, 10);
-        //console.log(`yyy dateOfBirth is ... ${res}`);
+        const iso = this._dateOfBirth.toISOString();
+        const res = iso.slice(0, 10);
+        //console.log(`${iso} becomes ${res}`);
         return res;
     }
 }
