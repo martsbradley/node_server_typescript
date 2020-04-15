@@ -27,12 +27,10 @@ export default class Database implements Store {
     const version = 0;
 
     console.log(`Inserting user with ${user.dateOfBirth}`);
-    const now = new Date();
-    console.log(`${now}`);
 
     const res = await this.pool.query('insert into patient ' +
                                       '(forename, surname, sex, dateofbirth, version) ' +
-                                      'values ($1, $2, $3, $4, $5) ' +
+                                      'values ($1, $2, $3, TO_DATE($4, \'YYYY-MM-DD\'), $5) ' +
                                       'returning id',
                                       [user.forename, 
                                       user.surname, 
@@ -81,13 +79,16 @@ async queryUser (id: number): Promise<User> {
 
     console.log(`Query User ${id}`);
 
-    const queryStr= 'select p.id as pID, m.id as mID, * '   +
-                    'from patient p '                       +
-                    'left outer join prescription pre '     +
-                    'on p.id = pre.patient_id '             +
-                    'left outer join medicine m '           +
-                    'on pre.medicine_id = m.id '            +
-                    'where p.id = $1';
+    const queryStr= 
+          'select p.id as pID, m.id as mID, '   +
+          'to_char(p.dateofbirth, \'YYYY-MM-DD\') as birthdate, ' +
+          '* '                                    +
+          'from patient p '                       +
+          'left outer join prescription pre '     +
+          'on p.id = pre.patient_id '             +
+          'left outer join medicine m '           +
+          'on pre.medicine_id = m.id '            +
+          'where p.id = $1';
 
     const dbresult = await this.pool.query(queryStr, [id]);
 
@@ -100,25 +101,19 @@ async queryUser (id: number): Promise<User> {
 
       for (const i in dbresult.rows) {
         const row = dbresult.rows[i];
+        console.log(row);
 
         if (firstRow) {
-
-          const d = new Date(row.dateofbirth);
 
           user = new User(row.pid,
                           row.forename,
                           row.surname,
                           row.sex,
-                          d);
+                          row.birthdate);
           firstRow = false;
         }
 
         if (row.medicine_id !== null) {
-        //const prescription ={medicineId: row.medicine_id,
-        //                      startDate: row.start_date,
-        //                      endDate:   row.end_date,
-        //                      amount:    row.amount ,
-        //                      name:      row.name};
           const prescription = new Prescription(row.medicine_id,
                                                 row.start_date,
                                                 row.end_date,
@@ -138,7 +133,8 @@ async queryUser (id: number): Promise<User> {
 
     console.log(`paging limit is ${pageInfo.limit} offset ${pageInfo.offset}`)
     try {
-      const query = 'SELECT * from patient order by id ' + 
+      const query = 'SELECT *,to_char(dateofbirth, \'YYYY-MM-DD\') as dateofbirth ' +
+                    'from patient order by id ' + 
                     'LIMIT $1 OFFSET $2';
 
       const dbresult = await this.pool.query(query, 

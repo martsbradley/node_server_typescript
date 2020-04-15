@@ -16,7 +16,7 @@ const queryData ={id:1,
                 surname: "Bradley",
                 sex: "Male",
                 dateofbirth: "1"};
-const users: User[] = [new User(1,'Martin','Bradley','Male',new Date())];
+const users: User[] = [new User(1,'Martin','Bradley','Male', '2020-02-02')];
 
 const mockQueryAllPatients =  jest.fn(() => { return new PatientResult(users, 1);});
 const mockCreatePatient =  jest.fn(()    => { return 1});

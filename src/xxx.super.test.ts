@@ -15,6 +15,7 @@ describe("xxx", () => {
       loadMedicines:    jest.fn(),
       closeDatabase:    jest.fn()
   };
+  const date = '2020-01-01';
   const userRouter  = new UserRouter(aStore);
 
   const app = express();
@@ -45,11 +46,6 @@ describe("xxx", () => {
                         dateOfBirth: '2020-01-01',
                         prescriptions};
 
-  const existingUserObject = new User(29, 
-                                      'Marty', 
-                                      'Buddy',
-                                      'Male',
-                                      new Date());
 
   const redirectToListUsers = (done: Function): request.CallbackHandler => {
     const handler: request.CallbackHandler = (err, res): void => {
@@ -106,6 +102,12 @@ describe("xxx", () => {
   it("List patients" , async (done) => {
 
     // The database returns instances of class User
+    const existingUserObject = new User(29, 
+                                      'Marty', 
+                                      'Brads',
+                                      'Male',
+                                       date);
+
     aStore.queryAllPatients = jest.fn(() => {
       const result: PatientResult = {data: [existingUserObject], total: 1};
       return Promise.resolve(result);
@@ -117,7 +119,13 @@ describe("xxx", () => {
             .expect(200)
             .end(function(err, res) {
               if (err) throw err;
-              else done();
+              else {
+                expect(res.status).toEqual(200);
+                expect(res.header['content-type']).toEqual("text/html; charset=utf-8");
+                expect(res.text).toContain('Marty');
+                expect(res.text).toContain('Brads');
+                done();
+              }
             });
   });
 });

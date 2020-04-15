@@ -14,6 +14,8 @@ jest.mock('pg', () => {
 
 describe('Database', () => {
 
+  const date = '2020-01-01';
+
   let pool: any;
   let db: Database;
   beforeAll(() => {
@@ -25,7 +27,7 @@ describe('Database', () => {
   it('createPatient', async () => {
     const id: number = undefined;
 
-    const user = new User (id, "m", "b", "m", new Date()); 
+    const user = new User (id, "m", "b", "m", date); 
 
     const rows: number[] = [99];
     const dbresult = {
@@ -50,7 +52,6 @@ describe('Database', () => {
 
   it('queryPatient one row', async () => {
 
-    const date = new Date();
     const data = [ {id: 1,
                     forename: "m",
                     surname: "b",
