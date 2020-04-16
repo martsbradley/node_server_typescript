@@ -72,9 +72,9 @@ describe('Server',  function() {
                    surname: 'Buddy',
                    sex: 'Male'})
             .end(function(err, res) {
-                expect(res.status).toEqual(500);
+                expect(res.status).toEqual(200);
                 expect(res.header['content-type']).toEqual("text/html; charset=utf-8");
-                expect(res.text).toContain('Unexpected Error');
+                expect(res.text).toContain('Unknown issue');
                 done();
             });
     });

@@ -38,4 +38,31 @@ export default class Validation {
             throw userErrors;
         }
     }
+
+    middle(pageName: string) {
+        return (req: express.Request, 
+                        res: express.Response, 
+                        next: express.NextFunction): void => {
+
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                const keys = Object.keys(req.body);
+
+                const err = this.errorMapper(keys, errors.array());
+
+                console.log("Send them back");
+                console.log(errors);
+
+                if (Object.keys(err).length === 0) {
+                    err['general'] = "Unknown issue";
+                }
+
+                res.render(pageName, {'user': req.body,
+                                      'errors': err});
+            }
+            else {
+                next();
+            }
+        }
+    }
 }

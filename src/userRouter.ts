@@ -31,10 +31,12 @@ export default class UserRouter {
 
         this.router.post('/new', 
                          checkSchema(NewUserSchema), 
+                         this.validation.middle('patient_new.html'),
                          this.createPatientHandler.bind(this));
 
         this.router.post('/', 
                          checkSchema(UserSchema),
+                         this.validation.middle('edit.html'),
                          this.updatePatientHandler.bind(this));
 
         this.router.get('/prescription/new',
@@ -58,6 +60,7 @@ export default class UserRouter {
             next();
         }
     }
+
 
 
     async createPrescriptionForm(req: express.Request, res: express.Response): Promise<void> {
@@ -102,8 +105,6 @@ export default class UserRouter {
         console.log("update this ...");
         console.log(user);
         try {
-            console.log(`Referred from ${req.header('Referer')}\nNeed to update "${user.id}"`);
-            this.validation.checkValidationResults(req);
 
             await this.db.updatePatient(user);
             console.log("Finished updatePatientHandler processing");
@@ -128,8 +129,6 @@ export default class UserRouter {
         console.log("createPatientHandler");
         console.log(user);
         try {
-
-            this.validation.checkValidationResults(req);
 
             const userId = await this.db.createPatient(user);
             console.log(`created a patient with id ${userId}`);
