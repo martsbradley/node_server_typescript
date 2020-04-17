@@ -17,6 +17,8 @@ export default class UserRouter {
         this.router = express.Router();
         this.db = db;
 
+        this.router.get('*', this.storePreviousPage.bind(this));
+
         this.router.get('/new', 
                       this.createPatientForm.bind(this));
 
@@ -43,25 +45,33 @@ export default class UserRouter {
                       this.createPrescriptionForm.bind(this));
     }
 
+
+    storePreviousPage(req: express.Request, res: express.Response, next: express.NextFunction): void {
+        const lastPage = req.header('Referer');
+        console.log(`Setting cookie as ${lastPage}`);
+        res.cookie('lastPage', lastPage, { expires: new Date(Date.now() + 900000), httpOnly: true })
+        // TODO some validation
+        next();
+    }
+
     cancelHandler(req: express.Request, res: express.Response, next: express.NextFunction): void {
         console.log("Is this Post a cancel")
 
         const body = req.body;
-      //console.log("body is");
-      //console.log(body);
-      //console.log("req keys");
-      //console.log(Object.keys(req));
 
         if (body['Cancel'] === 'Cancel') {
-            console.log("Cancel redirect...")
-            res.redirect(req.baseUrl + '/list');
+            const lastPage= req.cookies['lastPage'];
+            console.log(`Cancel redirect = ${lastPage}`)
+
+            // TODO
+            // some validation
+
+            res.redirect(lastPage);
         } else {
             console.log("Continue the Post processing.")
             next();
         }
     }
-
-
 
     async createPrescriptionForm(req: express.Request, res: express.Response): Promise<void> {
         const { page = 1, pageSize = 5, nameFilter= '' } = req.query;
@@ -74,7 +84,7 @@ export default class UserRouter {
 
         pageInfo.dataSize = medicines.total;
 
-        res.set('Cache-Control', 'max-age=300, private');
+        //res.set('Cache-Control', 'max-age=300, private');
 
         return res.render('prescription_new.html', {'medicines': medicines.data,
                                                     'pageInfo': pageInfo,
@@ -102,7 +112,10 @@ export default class UserRouter {
                                res: express.Response, 
                                next: express.NextFunction): Promise<void> {
         const user = req.body;
-        console.log("update this ...");
+        console.log("updatePatientHandler");
+
+        console.log('Cookies: ', req.cookies)
+
         console.log(user);
         try {
 

@@ -1,6 +1,7 @@
 import express = require('express');
 import Database  from './database';
 import UserRoutes from './userRouter';
+import cookieParser from 'cookie-parser'
 
 export default class Server {
 
@@ -14,7 +15,7 @@ export default class Server {
         this.express.use(express.json());
         this.express.use(express.urlencoded({ extended: true }));
         this.express.use(express.static('public'))
-
+        this.express.use(cookieParser());
 
         this.express.use('/user/', new UserRoutes(this.db).router);
 

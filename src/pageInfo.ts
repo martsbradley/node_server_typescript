@@ -94,7 +94,7 @@ export default class PageInfo {
 
     // limit th result to be 5 items by
     // removing the items that are furthest from this.page.
-    console.log(`Remove unneeded pages from ${result}`);
+    //console.log(`Remove unneeded pages from ${result}`);
 
     while (result.length > 5) {
       const x = result.map(x => Math.abs(x - this.page))

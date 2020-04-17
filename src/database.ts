@@ -101,7 +101,7 @@ async queryUser (id: number): Promise<User> {
 
       for (const i in dbresult.rows) {
         const row = dbresult.rows[i];
-        console.log(row);
+        //console.log(row);
 
         if (firstRow) {
 
@@ -143,7 +143,7 @@ async queryUser (id: number): Promise<User> {
       const users: User[] = [];
       for (const i in dbresult.rows) {
           const row = dbresult.rows[i];
-          console.log(`${row.forename} -> ${row.dateofbirth}`);
+          //console.log(`${row.forename} -> ${row.dateofbirth}`);
           const user = new User(row.id,
                                 row.forename,
                                 row.surname,
