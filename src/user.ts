@@ -18,20 +18,22 @@ export class Medicine {
 }
 
 export class Prescription {
+    prescriptionId: number;
     startDate: Date;
     endDate: Date;
     amount: string;
     medicine: Medicine;
 
-    constructor(medicineId: number,
+    constructor(prescriptionId: number,
                 startDate: Date,
                 endDate: Date,
                 amount: string,
-                name: string) {
+                medicine: Medicine) {
+        this.prescriptionId = prescriptionId;
         this.startDate = startDate;
         this.endDate = endDate;
         this.amount = amount;
-        this.medicine = new Medicine(medicineId, name, '','');
+        this.medicine = medicine;
     }
 
     get medicineId(): number{

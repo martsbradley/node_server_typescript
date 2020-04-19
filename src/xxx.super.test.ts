@@ -4,7 +4,6 @@ import Store from './store';
 import express from 'express';
 import request from 'supertest';
 import bodyParser from 'body-parser';
-import nunjucks from 'nunjucks';
 
 describe("xxx", () => {
   const aStore: Store  = {
@@ -24,10 +23,6 @@ describe("xxx", () => {
   app.use(bodyParser.json());
   app.use('/', userRouter.router);
 
-  nunjucks.configure('template', {
-      autoescape: true,
-      express: app
-  });
 
   function postUserRouter(url: string, data: object, result: request.CallbackHandler): void {
     request(app)

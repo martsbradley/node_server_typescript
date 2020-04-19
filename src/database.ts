@@ -80,7 +80,7 @@ async queryUser (id: number): Promise<User> {
     console.log(`Query User ${id}`);
 
     const queryStr= 
-          'select p.id as pID, m.id as mID, '   +
+          'select p.id as pID, m.id as mID, pre.id as preid,  '   +
           'to_char(p.dateofbirth, \'YYYY-MM-DD\') as birthdate, ' +
           '* '                                    +
           'from patient p '                       +
@@ -101,7 +101,7 @@ async queryUser (id: number): Promise<User> {
 
       for (const i in dbresult.rows) {
         const row = dbresult.rows[i];
-        //console.log(row);
+        console.log(row);
 
         if (firstRow) {
 
@@ -114,11 +114,17 @@ async queryUser (id: number): Promise<User> {
         }
 
         if (row.medicine_id !== null) {
-          const prescription = new Prescription(row.medicine_id,
+
+        const medicine = new Medicine(row.mid,
+                                      row.name,
+                                      row.manufacturer,
+                                      row.delivery_method);
+
+          const prescription = new Prescription(row.preid,
                                                 row.start_date,
                                                 row.end_date,
                                                 row.amount ,
-                                                row.name);
+                                                medicine);
           user.addPrescription(prescription);
         }
       }

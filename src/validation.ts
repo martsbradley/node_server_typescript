@@ -39,7 +39,7 @@ export default class Validation {
         }
     }
 
-    middle(pageName: string) {
+    middle() {
         return (req: express.Request, 
                         res: express.Response, 
                         next: express.NextFunction): void => {
@@ -57,8 +57,7 @@ export default class Validation {
                     err['general'] = "Unknown issue";
                 }
 
-                res.render(pageName, {'user': req.body,
-                                      'errors': err});
+                res.status(400).json(err);
             }
             else {
                 next();

@@ -1,15 +1,8 @@
 import Server from './server';
-import nunjucks from 'nunjucks';
 import Database  from './database'; 
 
 const db: Database = new Database();
 const server = new Server(db);
 
-nunjucks.configure('template', {
-    autoescape: true,
-    express: server.express,
-    watch: true
-});
-
-const port = 3000;
+const port = 3001;
 server.listen(port);

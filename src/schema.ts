@@ -40,8 +40,8 @@ export const inBody = {
 
 export const NewUserSchema = {
 
-    'forename': nameValid("forename", 1, 20),
-    'surname':  nameValid("surname", 1, 50),
+    'forename': nameValid("forename", 3, 20),
+    'surname':  nameValid("surname", 3, 50),
     'sex': {
         ...inBody,
         isIn: {options: [['Male', 'Female']] },

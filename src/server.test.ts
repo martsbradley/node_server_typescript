@@ -1,7 +1,6 @@
 import Server  from './server';
 import request  from 'supertest';
 import Database  from './database'; 
-import nunjucks from 'nunjucks';
 
 describe('Server',  function() {
     let  db: Database;
@@ -16,10 +15,6 @@ describe('Server',  function() {
         db = new Database();
         server = new Server(db);
 
-        nunjucks.configure('template', {
-            autoescape: true,
-            express: server.express,
-        });
     })
 
     afterAll(() => {
