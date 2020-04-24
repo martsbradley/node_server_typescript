@@ -44,8 +44,21 @@ describe("xxx", () => {
 
   const redirectToListUsers = (done: Function): request.CallbackHandler => {
     const handler: request.CallbackHandler = (err, res): void => {
-      expect(res.status).toEqual(302);
-      expect(res.header['location']).toEqual("/user/list");
+      expect(res.status).toEqual(200);
+        //expect(res.header['location']).toEqual("/user/list");
+      done();
+    };
+    return handler;
+  }
+  const requestFailed  = (done: Function, 
+                          part: string): request.CallbackHandler => {
+
+    const handler: request.CallbackHandler = (err, res): void => {
+      expect(res.status).toEqual(400);
+      expect(res.header['content-type']).toEqual("application/json; charset=utf-8");
+
+      expect(res.text).toContain(part);
+      
       done();
     };
     return handler;
@@ -56,7 +69,7 @@ describe("xxx", () => {
 
     const handler: request.CallbackHandler = (err, res): void => {
       expect(res.status).toEqual(200);
-      expect(res.header['content-type']).toEqual("text/html; charset=utf-8");
+      expect(res.header['content-type']).toEqual("application/json; charset=utf-8");
 
       expect(res.text).toContain(part);
       
@@ -71,27 +84,27 @@ describe("xxx", () => {
 
   it("Update patient forename blank name", async (done) => {
     postUserRouter('/', {...existingUser, forename: ''},
-                  stayOnFormPage(done, `forename must be between`));
+                  requestFailed(done, `forename must be between`));
   });
 
   it("Update patient surname blank name", async (done) => {
     postUserRouter('/', {...existingUser, surname: ''},
-                  stayOnFormPage(done, `surname must be between`));
+                  requestFailed(done, `surname must be between`));
   });
 
   // There is no error for this once because
   // the user cannot edit the id.
-  it("Update patient id too high", async (done) => {
+  it("Postive Update patient id Success", async (done) => {
     postUserRouter('/', {...existingUser, id: 400},
-                  stayOnFormPage(done, `Edit Patient`));
+                  redirectToListUsers(done));
   });
 
   it("New patient without dob", async (done) => {
     const newUser = {...existingUser, dateOfBirth: ''}
     delete newUser.id;
 
-    postUserRouter('/new', newUser,
-                  stayOnFormPage(done, `Create Patient`));
+    postUserRouter('/', newUser,
+                  requestFailed(done, `Date Of Birth is required`));
   });
 
   it("List patients" , async (done) => {
@@ -116,7 +129,8 @@ describe("xxx", () => {
               if (err) throw err;
               else {
                 expect(res.status).toEqual(200);
-                expect(res.header['content-type']).toEqual("text/html; charset=utf-8");
+                expect(res.header['content-type']).toEqual("application/json; charset=utf-8");
+                  
                 expect(res.text).toContain('Marty');
                 expect(res.text).toContain('Brads');
                 done();

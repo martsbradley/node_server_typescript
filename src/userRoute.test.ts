@@ -46,14 +46,15 @@ jest.mock('./validation', () => {
   });
 });*/
 
-function redirectUserList(done: Function): express.Response {
-  const response = new MockExpressResponse();
-  response.redirect = function(viewname: any): void {
-    console.log("Got here. .........");
-    expect(viewname).toEqual('/user/list');
-    done();
-  };
-  return response;
+
+function responseOK(done: Function): express.Response {
+    const response = new MockExpressResponse();
+    response.status = function(code: any): void {
+      console.log("Got here. .........");
+      expect(code).toEqual(200);
+      done();
+    };
+    return response;
 }
 
 describe("UserRouter", () => {
@@ -67,7 +68,7 @@ describe("UserRouter", () => {
     const request = new MockExpressRequest();
     request.body   = {forename : 'xxxx'};
 
-    const response = redirectUserList(done);
+    const response = responseOK(done);
 
     await userRouter.createPatientHandler(request, response, () => {});
   });
@@ -77,7 +78,7 @@ describe("UserRouter", () => {
     const request = new MockExpressRequest();
     request.body   = {forename : 'xxxx'};
 
-    const response = redirectUserList(done);
+    const response = responseOK(done);
 
     await userRouter.updatePatientHandler(request, response, () => {});
   });
@@ -109,16 +110,15 @@ describe("UserRouter", () => {
   it("listPatients one user", async (done) => {
 
     const request = new MockExpressRequest();
-    const response = new MockExpressResponse({
+    const response = new MockExpressResponse();
 
-    render: function(viewname: any, responseData: any): void {
-        const user: User = responseData.users[0];
-
-        expect(user.forename).toEqual('Martin');
-        expect(user.surname).toEqual('Bradley');
-        done();
-      }
-    });
+    response.status =  function(code: Number): void {
+      // const user: User = responseData.users[0];
+      console.log("Here done ok");
+    
+      expect(code).toEqual(200);
+      done();
+    }
 
     await userRouter.listPatients(request, response);
   });
@@ -126,10 +126,9 @@ describe("UserRouter", () => {
 
   it("UserRouter Postive Update Patient", async (done) => {
 
-    const response = redirectUserList(done);
-
+    const response = responseOK(done);
     const request = new MockExpressRequest();
-    //request.body   = {id : 24,
+
     request.body   = {
                       id: 11,
                       forename : 'xxxx'};

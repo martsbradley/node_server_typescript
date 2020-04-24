@@ -27,7 +27,7 @@ export default class UserRouter {
                          this.listPatients.bind(this));
 
 
-        this.router.post('/new', 
+        this.router.post('/', 
                          checkSchema(NewUserSchema), 
                          this.validation.middle(),
                          this.createPatientHandler.bind(this));
