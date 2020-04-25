@@ -1,142 +1,156 @@
-const MockExpressRequest = require('mock-express-request');
-const MockExpressResponse = require('mock-express-response');
-//global.checkSchema = require('express-validator');
-//import { checkSchema } from 'express-validator';
 import UserRouter from './userRouter';
-import User, { PatientResult } from './user';
-import Database from './database';
+import User, { PatientResult, Prescription } from './user';
+import Store from './store';
 import express from 'express';
 import request from 'supertest';
 import bodyParser from 'body-parser';
-import Validation from './validation';
+
+describe("userRouter", () => {
+
+  const aStore: Store  = {
+      createPatient:    jest.fn(),
+      updatePatient:    jest.fn(),
+      queryUser:        jest.fn(),
+      queryAllPatients: jest.fn(),
+      loadMedicines:    jest.fn(),
+      closeDatabase:    jest.fn()
+  };
+  const date = '2020-01-01';
+  const userRouter  = new UserRouter(aStore);
+
+  const app = express();
+
+  app.use(express.urlencoded({ extended: true }));
+  app.use(bodyParser.json());
+  app.use('/', userRouter.router);
 
 
-const queryData ={id:1,
-                forename: "Martin",
-                surname: "Bradley",
-                sex: "Male",
-                dateofbirth: "1"};
-const users: User[] = [new User(1,'Martin','Bradley','Male', '2020-02-02')];
+  function postUserRouter(url: string, data: object, result: request.CallbackHandler): void {
+    request(app)
+            .post(url)
+            .set('Accept', 'application/json')
+            .send(data)
+            .end(result);
+  }
 
-const mockQueryAllPatients =  jest.fn(() => { return new PatientResult(users, 1);});
-const mockCreatePatient =  jest.fn(()    => { return 1});
-const mockUpdatePatient =  jest.fn(()    => { return true});
+  function putUserRouter(url: string, data: object, result: request.CallbackHandler): void {
+    request(app)
+            .put(url)
+            .set('Accept', 'application/json')
+            .send(data)
+            .end(result);
+  }
 
+  const prescriptions: Prescription[] = [];
 
-jest.mock('./database', () => {
-  return jest.fn().mockImplementation(() => {
-    return {queryAllPatients: mockQueryAllPatients,
-            updatePatient: mockUpdatePatient,
-            createPatient: mockCreatePatient}
-  });
-});
-
-/*
-const okFn = jest.fn(() => {
-      console.log("Yes right ok")
-});
-const throwFn = jest.fn(() => {
-      console.log("Yes right throw")
-      throw {};
-});
-
-jest.mock('./validation', () => {
-  return jest.fn().mockImplementation(() => {
-    return {checkValidationResults:   okFn };
-  });
-});*/
+  const existingUser = {id: 28,
+                        forename: 'Marty', 
+                        surname: 'Buddy',
+                        sex: 'Male',
+                        dateOfBirth: '2020-01-01',
+                        prescriptions};
 
 
-function responseOK(done: Function): express.Response {
-    const response = new MockExpressResponse();
-    response.status = function(code: any): void {
-      console.log("Got here. .........");
-      expect(code).toEqual(200);
+  const requestGood = (done: Function): request.CallbackHandler => {
+    const handler: request.CallbackHandler = (err, res): void => {
+      expect(res.status).toEqual(200);
+        //expect(res.header['location']).toEqual("/user/list");
       done();
     };
-    return response;
-}
+    return handler;
+  }
+  const requestFailed  = (done: Function, 
+                          part: string): request.CallbackHandler => {
 
-describe("UserRouter", () => {
+    const handler: request.CallbackHandler = (err, res): void => {
+      expect(res.status).toEqual(400);
+      expect(res.header['content-type']).toEqual("application/json; charset=utf-8");
 
-  const db: Database = new Database();
-  const userRouter  = new UserRouter(db);
-
-  
-
-  it("Postive Create User", async (done) => {
-    const request = new MockExpressRequest();
-    request.body   = {forename : 'xxxx'};
-
-    const response = responseOK(done);
-
-    await userRouter.createPatientHandler(request, response, () => {});
-  });
-
-
-  it("Postive Update User", async (done) => {
-    const request = new MockExpressRequest();
-    request.body   = {forename : 'xxxx'};
-
-    const response = responseOK(done);
-
-    await userRouter.updatePatientHandler(request, response, () => {});
-  });
-
-  it("Negative Create User back to patient_new.html", 
-                async (done) => {
-
-//  const request = new MockExpressRequest();
-//  request.body   = {forename : 'xxxx'};
-
-////const response = new MockExpressResponse({
-////  render: function(viewname: any, responseData: any): void {
-
-////      expect(viewname).toEqual("patient_new.html");
-////      done();
-////    }
-////  }
-////);
-
-//  console.log("checkValidationResults");
-//  const validation = new Validation()
-//  validation.checkValidationResults(request);
-
-    done();
-
-    //await userRouter.createPatientHandler(request, response);
-  });
-
-  it("listPatients one user", async (done) => {
-
-    const request = new MockExpressRequest();
-    const response = new MockExpressResponse();
-
-    response.status =  function(code: Number): void {
-      // const user: User = responseData.users[0];
-      console.log("Here done ok");
-    
-      expect(code).toEqual(200);
+      expect(res.text).toContain(part);
+      
       done();
-    }
+    };
+    return handler;
+  }
 
-    await userRouter.listPatients(request, response);
+  const stayOnFormPage = (done: Function, 
+                          part: string): request.CallbackHandler => {
+
+    const handler: request.CallbackHandler = (err, res): void => {
+      expect(res.status).toEqual(200);
+      expect(res.header['content-type']).toEqual("application/json; charset=utf-8");
+
+      expect(res.text).toContain(part);
+      
+      done();
+    };
+    return handler;
+  }
+
+  it("Pos: Create patient supertest", async (done) => {
+    postUserRouter('/', existingUser, requestGood(done));
+  });
+
+  it("Neg: Post Patient missing dob", async (done) => {
+    const newUser = {...existingUser, dateOfBirth: ''}
+    delete newUser.id;
+
+    postUserRouter('/', newUser,
+                  requestFailed(done, `Date Of Birth is required`));
+  });
+
+  it("Neg: Post Patient missing surname", async (done) => {
+    const newUser = {...existingUser, surname: ''}
+    delete newUser.id;
+
+    postUserRouter('/', newUser,
+                  requestFailed(done, `surname must be between `));
+  });
+
+  it("Neg: Update patient forename blank", async (done) => {
+    putUserRouter('/', {...existingUser, forename: ''},
+                  requestFailed(done, `forename must be between`));
+  });
+
+  it("Neg: Update patient surname blank", async (done) => {
+    putUserRouter('/', {...existingUser, surname: ''},
+                  requestFailed(done, `surname must be between`));
+  });
+
+  it("Pos: Update patient", async (done) => {
+    putUserRouter('/', {...existingUser, id: 20},
+                  requestGood(done));
   });
 
 
-  it("UserRouter Postive Update Patient", async (done) => {
+  it("Pos: List patients" , async (done) => {
 
-    const response = responseOK(done);
-    const request = new MockExpressRequest();
+    // The database returns instances of class User
+    const existingUserObject = new User(29, 
+                                      'Marty', 
+                                      'Brads',
+                                      'Male',
+                                       date);
 
-    request.body   = {
-                      id: 11,
-                      forename : 'xxxx'};
-
-    console.log("here......")
-    await userRouter.updatePatientHandler(request, response, () =>{
-      console.log("next called");
-      done()
+    aStore.queryAllPatients = jest.fn(() => {
+      const result: PatientResult = {data: [existingUserObject], total: 1};
+      return Promise.resolve(result);
     });
+
+
+    request(app)
+            .get('/list')
+            .expect(200)
+            .end(function(err, res) {
+              if (err) throw err;
+              else {
+                expect(res.status).toEqual(200);
+                expect(res.header['content-type']).toEqual("application/json; charset=utf-8");
+                  
+                expect(res.text).toContain('Marty');
+                expect(res.text).toContain('Brads');
+                done();
+              }
+            });
   });
 });
