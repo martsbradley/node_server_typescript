@@ -18,14 +18,12 @@ export default class UserRouter {
         this.router = express.Router();
         this.db = db;
 
-
         this.router.get('/', 
                         checkSchema(idParamSchema),
                         this.loadPatientHandler.bind(this));
 
         this.router.get('/list', 
                          this.listPatients.bind(this));
-
 
         this.router.post('/', 
                          checkSchema(NewUserSchema), 
@@ -36,9 +34,6 @@ export default class UserRouter {
                         checkSchema(UserSchema),
                         this.validation.middle(),
                         this.updatePatientHandler.bind(this));
-
-        this.router.get('/prescription/new',
-                      this.createPrescriptionForm.bind(this));
     }
 
 
@@ -69,20 +64,8 @@ export default class UserRouter {
   //    }
   //}
 
-  getPageInfo(query: core.Query): PageInfo {
-    const { page = '1', pageSize = '5', nameFilter = '' } = query;
-
-    const p = Number(page);
-    const s = Number(pageSize);
-
-    const f = String(nameFilter);
-
-    const pageInfo = new PageInfo(p, s, f);
-    return pageInfo;
-  }
-
-    async createPrescriptionForm(req: express.Request, res: express.Response): Promise<void> {
-        const { page = '1', pageSize = '5', nameFilter = '' } = req.query;
+    getPageInfo(query: core.Query): PageInfo {
+        const { page = '1', pageSize = '5', nameFilter = '' } = query;
 
         const p = Number(page);
         const s = Number(pageSize);
@@ -90,25 +73,7 @@ export default class UserRouter {
         const f = String(nameFilter);
 
         const pageInfo = new PageInfo(p, s, f);
-        
-        console.log("making user form...");
-
-        const medicines: MedicineResult = await this.db.loadMedicines(pageInfo);
-
-        pageInfo.dataSize = medicines.total;
-
-        //res.set('Cache-Control', 'max-age=300, private');
-
-        return res.render('prescription_new.html', {'medicines': medicines.data,
-                                                    'pageInfo': pageInfo,
-                                                    'totalMeds': medicines.total});
-    }
-
-    async createPatientForm(req: express.Request, res: express.Response): Promise<void> {
-        console.log("making user form...");
-        const user: object = { sex: 'Male', 
-                               dateOfBirth: 'Sat Mar 01 2020 00:00:00'};
-        return res.render('patient_new.html', {'user': user});
+        return pageInfo;
     }
 
     /* The keys are the input fields from the html form

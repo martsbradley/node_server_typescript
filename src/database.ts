@@ -139,7 +139,8 @@ async queryUser (id: number): Promise<User> {
 
     console.log(`paging limit is ${pageInfo.limit} offset ${pageInfo.offset}`)
     try {
-      const query = 'SELECT *,to_char(dateofbirth, \'YYYY-MM-DD\') as dateofbirth ' +
+      const query = 'SELECT *,to_char(dateofbirth, \'YYYY-MM-DD\') as dateofbirth, ' +
+                    'count(*) OVER() AS full_count ' +
                     'from patient order by id ' + 
                     'LIMIT $1 OFFSET $2';
 
@@ -157,9 +158,11 @@ async queryUser (id: number): Promise<User> {
                                 row.dateofbirth);
         users.push(user);
       }
-      const allresult = await this.pool.query("select count(*) as count from patient");
 
-      const count = allresult.rows[0].count;
+      let count = 0;
+      if (dbresult.rows.length > 0) {
+          count = dbresult.rows[0].full_count;
+      }
 
       result = new PatientResult(users, count);
     }
@@ -176,12 +179,22 @@ async queryUser (id: number): Promise<User> {
     let result: MedicineResult ;
 
     try {
-      const query = 'SELECT * from medicine order by id ' +
-                     'LIMIT $1 OFFSET $2';
 
-      const dbresult = await this.pool.query(query, 
-                                            [pageInfo.limit, 
-                                             pageInfo.offset]);
+      let where = "";
+
+      //@typescript-eslint-disable-next-line no-explicit-any
+      const queryArgs: any[]= [pageInfo.limit, pageInfo.offset]
+
+      if (pageInfo.nameFilter !== '') {
+          const arg: string = pageInfo.nameFilter + '%';
+          queryArgs.push(arg);
+          where = "WHERE name like $3 ";
+      }
+
+      const query = `SELECT *, count(*) OVER() AS full_count from medicine ${where} ORDER BY id LIMIT $1 OFFSET $2`;
+
+      const dbresult = await this.pool.query(query, queryArgs);
+
       const meds: Medicine[] = [];
       for (const i in dbresult.rows) {
           const row = dbresult.rows[i];
@@ -191,10 +204,12 @@ async queryUser (id: number): Promise<User> {
                                    row.delivery_method);
           meds.push(med);
       }
+      
+      let count = 0;
 
-      const allresult = await this.pool.query("select count(*) as count from medicine");
-      const count = allresult.rows[0].count;
-      //console.log(`There are ${count} medicines `)
+      if (dbresult.rows.length > 0) {
+          count = dbresult.rows[0].full_count;
+      }
 
       result = new MedicineResult(meds, count);
     }

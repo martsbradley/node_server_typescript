@@ -1,16 +1,16 @@
 import { PageResult } from './pageInfo';
 
 export class Medicine {
-    medicineId: number;
+    id: number;
     name: string;
     manufacturer: string;
     deliveryMethod: string;
 
-    constructor(medicineId: number,
+    constructor(id: number,
                 name: string,
                 manufacturer: string,
                 deliveryMethod: string){
-        this.medicineId = medicineId;
+        this.id = id;
         this.name = name;
         this.manufacturer = manufacturer;
         this.deliveryMethod = deliveryMethod;
@@ -37,7 +37,7 @@ export class Prescription {
     }
 
     get medicineId(): number{
-        return this.medicine.medicineId;
+        return this.medicine.id;
     }
 
     get name(): string {
