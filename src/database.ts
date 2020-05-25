@@ -10,7 +10,7 @@ export default class Database implements Store {
   pool: Pool;
 
   constructor() {
-    console.log(`Connecting to Database ... ${process.env["PG_DATABASE"]}`);
+      //console.log(`Connecting to Database ... ${process.env["PG_DATABASE"]}`);
     this.pool = new Pool({
         user:     process.env["PG_USER"],
         password: process.env["PG_PASSWORD"],
@@ -26,7 +26,7 @@ export default class Database implements Store {
 
     const version = 0;
 
-    console.log(`Inserting user with ${user.dateOfBirth}`);
+      //console.log(`Inserting user with ${user.dateOfBirth}`);
 
     const res = await this.pool.query('insert into patient ' +
                                       '(forename, surname, sex, dateofbirth, version) ' +
@@ -38,7 +38,7 @@ export default class Database implements Store {
                                       user.dateOfBirth,
                                       version]);
     if (res.rowCount != 1) {
-        console.log(res);
+        //console.log(res);
         throw {"general": "Database Error, unable to Save User"};
     }
     return res.rows[0];
@@ -49,7 +49,7 @@ export default class Database implements Store {
 
     let result = false;
 
-    console.log(`Update Patient ${user.id} to ${user.forename} ${user.surname} ${user.dateOfBirth}`);
+      //console.log(`Update Patient ${user.id} to ${user.forename} ${user.surname} ${user.dateOfBirth}`);
 
     try {
         const res = await this.pool.query('update patient set ' +
@@ -60,13 +60,13 @@ export default class Database implements Store {
                           'WHERE id = $5',
             [user.forename, user.surname, user.sex, user.dateOfBirth, user.id]);
 
-        console.log(`updatePatient ${res.rowCount}`);
+        //console.log(`updatePatient ${res.rowCount}`);
         if (res.rowCount == 0) {
-          console.log(`throw error1`);
+            //console.log(`throw error1`);
           throw {"general": "Database Error, unable to Save User"};
         }
     }catch (err) {
-        console.log("Save failed " + err);
+        //console.log("Save failed " + err);
 
         throw {"general": "Database Error, unable to Save User"};
     }
@@ -77,7 +77,7 @@ export default class Database implements Store {
 
 async queryUser (id: number): Promise<User> {
 
-    console.log(`Query User ${id}`);
+    //console.log(`Query User ${id}`);
 
     const queryStr= 
           'select p.id as pID, m.id as mID, pre.id as preid,  '   +
@@ -92,7 +92,7 @@ async queryUser (id: number): Promise<User> {
 
     const dbresult = await this.pool.query(queryStr, [id]);
 
-    console.log("Running query");
+    //console.log("Running query");
 
     let user: User = null;
 
@@ -101,7 +101,7 @@ async queryUser (id: number): Promise<User> {
 
       for (const i in dbresult.rows) {
         const row = dbresult.rows[i];
-        console.log(row);
+          //console.log(row);
 
         if (firstRow) {
 
@@ -129,7 +129,7 @@ async queryUser (id: number): Promise<User> {
         }
       }
 
-      console.log("Found user " + user);
+        //console.log("Found user " + user);
     }
     return user;
 }
@@ -137,10 +137,10 @@ async queryUser (id: number): Promise<User> {
   async queryAllPatients(pageInfo: PageInfo): Promise<PatientResult> {
     let result: PatientResult;
 
-    console.log(`paging limit is ${pageInfo.limit} offset ${pageInfo.offset}`)
+      //console.log(`paging limit is ${pageInfo.limit} offset ${pageInfo.offset}`)
     try {
       const query = 'SELECT *,to_char(dateofbirth, \'YYYY-MM-DD\') as dateofbirth, ' +
-                    'count(*) OVER() AS full_count ' +
+                    'count(*) OVER() AS fullcount ' +
                     'from patient order by id ' + 
                     'LIMIT $1 OFFSET $2';
 
@@ -161,13 +161,13 @@ async queryUser (id: number): Promise<User> {
 
       let count = 0;
       if (dbresult.rows.length > 0) {
-          count = dbresult.rows[0].full_count;
+          count = dbresult.rows[0].fullcount;
       }
 
       result = new PatientResult(users, count);
     }
     catch (error) {
-        console.log(error);
+        //console.log(error);
         throw {"general": "Database Error, unable to Query User"};
     }
 
@@ -191,7 +191,7 @@ async queryUser (id: number): Promise<User> {
           where = "WHERE name like $3 ";
       }
 
-      const query = `SELECT *, count(*) OVER() AS full_count from medicine ${where} ORDER BY id LIMIT $1 OFFSET $2`;
+      const query = `SELECT *, count(*) OVER() AS fullcount from medicine ${where} ORDER BY id LIMIT $1 OFFSET $2`;
 
       const dbresult = await this.pool.query(query, queryArgs);
 
@@ -208,13 +208,13 @@ async queryUser (id: number): Promise<User> {
       let count = 0;
 
       if (dbresult.rows.length > 0) {
-          count = dbresult.rows[0].full_count;
+          count = dbresult.rows[0].fullcount;
       }
 
       result = new MedicineResult(meds, count);
     }
     catch (error) {
-        console.log(error);
+        //console.log(error);
         throw {"general": "Database Error, unable to Query Medicine"};
     }
     return result;
@@ -222,6 +222,6 @@ async queryUser (id: number): Promise<User> {
 
   closeDatabase(): void{ 
       this.pool.end()
-      console.log("closed pool")
+      //console.log("closed pool")
   }
 }

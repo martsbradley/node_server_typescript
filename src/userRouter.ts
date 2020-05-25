@@ -82,7 +82,7 @@ export default class UserRouter {
         so use the express error handler to catch it.
         */
     private unhandledError(err: object): boolean {
-        console.log(err);
+        //console.log(err);
         return (Object.keys(err).length === 0);
     }
 
@@ -90,16 +90,16 @@ export default class UserRouter {
                                res: express.Response, 
                                next: express.NextFunction): Promise<void> {
         const user = req.body;
-        console.log("updatePatientHandler");
+        //console.log("updatePatientHandler");
         res.setHeader('Content-Type', 'application/json');
 
-        console.log('Cookies: ', req.cookies)
+        //console.log('Cookies: ', req.cookies)
 
-        console.log(user);
+        //console.log(user);
         try {
 
             await this.db.updatePatient(user);
-            console.log("Finished updatePatientHandler processing");
+            //console.log("Finished updatePatientHandler processing");
             res.status(200).json({});
         }
         catch (err) {
@@ -117,12 +117,12 @@ export default class UserRouter {
         res.setHeader('Content-Type', 'application/json');
 
         const user = req.body;
-        console.log("createPatientHandler");
-        console.log(user);
+      //console.log("createPatientHandler");
+      //console.log(user);
         try {
 
             const userId = await this.db.createPatient(user);
-            console.log(`created a patient with id ${userId}`);
+          //console.log(`created a patient with id ${userId}`);
         }
         catch (err) {
             if (this.unhandledError(err)){
@@ -144,18 +144,18 @@ export default class UserRouter {
         res.setHeader('Content-Type', 'application/json');
 
         if (!errors.isEmpty()) {
-            console.log(errors);
+          //console.log(errors);
             res.status(401).json(JSON.stringify(errors, null, 3));
         }
 
         const id = parseInt(req.query.id as string, 10);
-        console.log(`Handling the /user/edit/${id}`);
+      //console.log(`Handling the /user/edit/${id}`);
 
         const user = await this.db.queryUser(id);
         const data = {'user': user};
 
         if (!user) {
-            console.log(`User id ${id} not found`);
+          //console.log(`User id ${id} not found`);
             res.status(404)
         }
 
@@ -165,7 +165,7 @@ export default class UserRouter {
     async listPatients(req: express.Request,
                        res: express.Response): Promise<void> {
 
-        console.log("here in list patients");
+      //console.log("here in list patients");
         const pageInfo = this.getPageInfo(req.query); //new PageInfo(page, pageSize, nameFilter);
             
 
@@ -176,7 +176,7 @@ export default class UserRouter {
                        'pageInfo': pageInfo};
 
         res.setHeader('Content-Type', 'application/json');
-        console.log("return in list patients");
+      //console.log("return in list patients");
 
         res.status(200).json(data);
     }

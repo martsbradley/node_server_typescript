@@ -27,12 +27,12 @@ export default class PageInfo {
     pageSize = integerPart(pageSize);
 
     if (!page || page < 0) {
-      console.log(`page invalid as ${page}`);
+        //console.log(`page invalid as ${page}`);
       page = 1;
     }
 
     if (!pageSize || pageSize < 0 || pageSize > 20) {
-      console.log(`pageSize invalid as ${pageSize}`);
+        //console.log(`pageSize invalid as ${pageSize}`);
       pageSize = 5;
     }
 

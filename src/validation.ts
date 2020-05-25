@@ -28,7 +28,7 @@ export default class Validation {
         if (!errors.isEmpty()) {
             console.log("Validation issues!!!");
 
-            console.log(errors);
+          //console.log(errors);
 
             const keys = Object.keys(req.body);
 
@@ -50,8 +50,8 @@ export default class Validation {
 
                 const err = this.errorMapper(keys, errors.array());
 
-                console.log("Send them back");
-                console.log(errors);
+              //console.log("Send them back");
+              //console.log(errors);
 
                 if (Object.keys(err).length === 0) {
                     err['general'] = "Unknown issue";

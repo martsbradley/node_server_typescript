@@ -22,17 +22,17 @@ export default class Server {
         this.express.use('/auth/', new AuthVerify(this.db).router);
         this.express.use('/user/', new UserRoutes(this.db).router);
         this.express.use('/meds/', new PrescriptionRoute(this.db).router);
-
+             
         this.express.use(function (err: object, req: express.Request, res: express.Response, _nextIgnored: express.NextFunction) {
-            console.error("Here in the handler");
-            console.error(err)
+            //console.error("Here in the handler");
+            //console.error(err)
             res.status(500).send('Server 500: Unexpected Error')
         });
     }
 
     listen(port: number): void{
-        console.log(`This ${port} opening...`)
-        console.log(`By ${this.express}`)
+        //console.log(`This ${port} opening...`)
+        //console.log(`By ${this.express}`)
         this.express.listen(port, () => console.log(`Example app listening on port ${port}!`));
     }
 }

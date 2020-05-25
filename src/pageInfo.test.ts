@@ -39,7 +39,7 @@ describe('PageInfo', () => {
       expect(pageInfo.offset).toEqual(45);
       expect(pageInfo.navLastPage).toEqual(20);
       const result = pageInfo.navPages;
-      console.log(`result is ${result}`);
+      //console.log(`result is ${result}`);
       //expect(result).toEqual([2,3,4])
 
   });

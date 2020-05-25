@@ -50,28 +50,6 @@ describe('Database', () => {
                     expect(patientResult.total).toEqual(0)});
   })
 
-  it('queryPatient one row', async () => {
-
-    const data = [ {id: 1,
-                    forename: "m",
-                    surname: "b",
-                    sex: "m",
-                    dateofbirth: date}];
-
-    pool.query.mockResolvedValueOnce({ rows: data, rowCount: 0 });
-    pool.query.mockResolvedValueOnce({ rows: [{count: 120}], rowCount: 1 });
-
-    const u = new User(1, "m", "b", "m", date);
-
-    const pageInfo = new PageInfo(1,5, "");
-    return db.queryAllPatients(pageInfo)
-             .then(patientResult => 
-                {expect(patientResult.data).toStrictEqual([u])
-                 expect(patientResult.total).toEqual(120)});
-  })
-
-
-
   it('database down', async () => {
     pool.query.mockImplementation(() => {
       throw {"pg": "some unknown issue from PostGreSQL" }});
@@ -81,5 +59,25 @@ describe('Database', () => {
           catch(error => 
             expect(error.general).
                   toStrictEqual("Database Error, unable to Query User"));
+  })
+
+  it('queryPatient one row', async () => {
+
+    const data = [ {id: 1,
+                    forename: "m",
+                    surname: "b",
+                    sex: "m",
+                    dateofbirth: date,
+                    fullcount: 120 }];
+
+    pool.query.mockResolvedValueOnce({ rows: data, rowCount: 1 });
+
+    const u = new User(1, "m", "b", "m", date);
+
+    const pageInfo = new PageInfo(1,5, "");
+    return db.queryAllPatients(pageInfo)
+             .then(patientResult => 
+                {expect(patientResult.data).toStrictEqual([u])
+                 expect(patientResult.total).toEqual(120)});
   })
 });

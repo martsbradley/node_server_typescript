@@ -82,8 +82,8 @@ describe('Server',  function() {
                    sex: 'Male',
                    dateOfBirth: '2011-10-01'})
             .end(function(err, res) {
-                console.log("ok checking now");
-                console.log(res.text);
+              //console.log("ok checking now");
+              //console.log(res.text);
                 expect(res.status).toEqual(200);
               //expect(res.header['content-type']).toEqual("text/plain; charset=utf-8");
               //expect(res.text).toContain('Found. Redirecting to /user/list');

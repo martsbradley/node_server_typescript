@@ -32,8 +32,6 @@ export default class PrescriptionRoute {
 
         const pageInfo = new PageInfo(p, s, f);
         
-        console.log("making user form...");
-
         const medicines: MedicineResult = await this.db.loadMedicines(pageInfo);
 
         pageInfo.dataSize = medicines.total;
