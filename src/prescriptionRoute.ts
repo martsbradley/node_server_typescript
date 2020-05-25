@@ -20,6 +20,8 @@ export default class PrescriptionRoute {
 
         this.router.get('/', 
                          this.listMedicines.bind(this));
+        this.router.post('/',
+                         this.createPrescription.bind(this));
     }
 
     async listMedicines(req: express.Request, res: express.Response): Promise<void> {
@@ -40,5 +42,13 @@ export default class PrescriptionRoute {
                       'pageInfo': pageInfo};
 
         res.status(200).json(data);
+    }
+
+    async createPrescription(req: express.Request, res: express.Response): Promise<void> {
+        const prescription = req.body.prescription;
+        const patientId    = req.body.patientId;
+        const id = await this.db.createPrescription(patientId, prescription);
+
+        res.status(200).json({prescriptionId: id});
     }
 }

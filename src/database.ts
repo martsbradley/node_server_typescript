@@ -20,6 +20,31 @@ export default class Database implements Store {
       });
 
   }
+    
+    async createPrescription(patientId: number, 
+                             prescription: Prescription): Promise<number>{
+  //console.log('createPrescription');
+  //console.log(`patientId ${patientId}`);
+  //console.log(prescription);
+
+    assert(prescription.prescriptionId === undefined);
+    assert(prescription.medicine !== null);
+    assert(prescription.medicine.id !== undefined);
+
+    const res = await this.pool.query('insert into prescription ' +
+                                      '(patient_id, medicine_id,start_date, end_date, amount) ' +
+                                      'values ($1, $2, TO_DATE($3, \'YYYY-MM-DD\'), TO_DATE($4, \'YYYY-MM-DD\'), $5) ' +
+                                      'returning id',
+                                      [patientId,
+                                       prescription.medicine.id,
+                                       prescription.startDate,
+                                       prescription.endDate,
+                                       'lots']);
+    if (res.rowCount != 1) {
+        throw {"general": "Database Error, unable to Save User"};
+    }
+    return res.rowCount;
+  }
 
   async createPatient(user: User): Promise<number>  {
     assert(user.id === undefined);

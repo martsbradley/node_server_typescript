@@ -1,20 +1,14 @@
 import PrescriptionRoute from './prescriptionRoute';
 import { MedicineResult, Medicine } from './user';
 import Store from './store';
+import {MockStore} from './store-mock';
 import express from 'express';
 import request from 'supertest';
 import bodyParser from 'body-parser';
 
 describe("prescriptionRoute", () => {
 
-  const aStore: Store  = {
-      createPatient:    jest.fn(),
-      updatePatient:    jest.fn(),
-      queryUser:        jest.fn(),
-      queryAllPatients: jest.fn(),
-      loadMedicines:    jest.fn(),
-      closeDatabase:    jest.fn()
-  };
+  const aStore: Store = MockStore;
 
 //this.aStore.loadMedicines = jest.fn(() => {
 //  const result: PatientResult = {data: [], total: 1};

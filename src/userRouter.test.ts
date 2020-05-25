@@ -1,22 +1,16 @@
 import UserRouter from './userRouter';
 import User, { PatientResult, Prescription } from './user';
 import Store from './store';
+import {MockStore} from './store-mock';
 import express from 'express';
 import request from 'supertest';
 import bodyParser from 'body-parser';
 
 describe("userRouter", () => {
 
-  const aStore: Store  = {
-      createPatient:    jest.fn(),
-      updatePatient:    jest.fn(),
-      queryUser:        jest.fn(),
-      queryAllPatients: jest.fn(),
-      loadMedicines:    jest.fn(),
-      closeDatabase:    jest.fn()
-  };
+  const aStore: Store = MockStore;
   const date = '2020-01-01';
-  const userRouter  = new UserRouter(aStore);
+  const userRouter = new UserRouter(aStore);
 
   const app = express();
 
