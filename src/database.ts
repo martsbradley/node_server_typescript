@@ -106,7 +106,9 @@ async queryUser (id: number): Promise<User> {
 
     const queryStr= 
           'select p.id as pID, m.id as mID, pre.id as preid,  '   +
-          'to_char(p.dateofbirth, \'YYYY-MM-DD\') as birthdate, ' +
+          'to_char(p.dateofbirth,  \'YYYY-MM-DD\') as birthdate, ' +
+          'to_char(pre.start_date, \'YYYY-MM-DD\') as startdate, ' +
+          'to_char(pre.end_date,   \'YYYY-MM-DD\') as enddate, ' +
           '* '                                    +
           'from patient p '                       +
           'left outer join prescription pre '     +
@@ -146,8 +148,8 @@ async queryUser (id: number): Promise<User> {
                                       row.delivery_method);
 
           const prescription = new Prescription(row.preid,
-                                                row.start_date,
-                                                row.end_date,
+                                                row.startdate,
+                                                row.enddate,
                                                 row.amount ,
                                                 medicine);
           user.addPrescription(prescription);

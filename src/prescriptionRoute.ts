@@ -22,9 +22,13 @@ export default class PrescriptionRoute {
                          this.listMedicines.bind(this));
         this.router.post('/',
                          this.createPrescription.bind(this));
+
+        this.router.get('/abc',
+                         this.deletePrescription.bind(this));
     }
 
     async listMedicines(req: express.Request, res: express.Response): Promise<void> {
+        console.log("listMedicines");
         const { page = '1', pageSize = '5', filter = '' } = req.query;
 
         const p = Number(page);
@@ -50,5 +54,16 @@ export default class PrescriptionRoute {
         const id = await this.db.createPrescription(patientId, prescription);
 
         res.status(200).json({prescriptionId: id});
+    }
+
+    async deletePrescription(req: express.Request, res: express.Response): Promise<void> {
+      
+        //const prescriptionId = req.params.prescriptionId;
+        //console.log(`Server needs to delete ${prescriptionId}`);
+       console.log('Server needs to delete');
+
+        //const id = await this.db.createPrescription(patientId, prescription);
+
+        res.status(200).json({data: [1,2,3]});
     }
 }
