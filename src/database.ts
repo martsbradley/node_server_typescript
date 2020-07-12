@@ -69,6 +69,25 @@ export default class Database implements Store {
     return res.rows[0];
   }
 
+  async deletePrescription(prescriptionId: number): Promise<boolean> {
+    assert(prescriptionId !== undefined);
+
+    let result = false;
+
+    try {
+        const res = await this.pool.query('delete from prescription where id = $1', [prescriptionId]);
+
+        if (res.rowCount == 0) {
+          throw {"general": "Database Error, No rows found"};
+        }
+        result = true;
+    }catch (err) {
+        throw {"general": "Database Error, unable to Save User" + err};
+    }
+
+    return result;
+  }
+
   async updatePatient(user: User): Promise<boolean>  {
     assert(user.id !== undefined);
 

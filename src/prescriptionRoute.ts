@@ -23,7 +23,7 @@ export default class PrescriptionRoute {
         this.router.post('/',
                          this.createPrescription.bind(this));
 
-        this.router.get('/abc',
+        this.router.delete('/prescription/:prescriptionId',
                          this.deletePrescription.bind(this));
     }
 
@@ -58,11 +58,10 @@ export default class PrescriptionRoute {
 
     async deletePrescription(req: express.Request, res: express.Response): Promise<void> {
       
-        //const prescriptionId = req.params.prescriptionId;
-        //console.log(`Server needs to delete ${prescriptionId}`);
-       console.log('Server needs to delete');
+        const prescriptionId = Number(req.params.prescriptionId);
+        console.log(`Server needs to delete ${prescriptionId}`);
 
-        //const id = await this.db.createPrescription(patientId, prescription);
+        await this.db.deletePrescription(prescriptionId);
 
         res.status(200).json({data: [1,2,3]});
     }
